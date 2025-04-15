@@ -33,7 +33,8 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { mockLeaveBalances } from "@/data/mockData";
+import { mockLeaveBalances, userProfile } from "@/data/mockData";
+import { toast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   leaveType: z.string({
@@ -62,7 +63,23 @@ const LeaveRequest = () => {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // In a real app, you would send this data to your backend
-    alert(JSON.stringify(values, null, 2));
+    const newLeaveRequest = {
+      ...values,
+      supervisorName: userProfile.supervisorName,
+      supervisorId: userProfile.supervisorId,
+    };
+    
+    console.log("Submitting leave request:", newLeaveRequest);
+    
+    // Show success toast
+    toast({
+      title: "Leave request submitted",
+      description: "Your request has been sent to your supervisor for approval.",
+    });
+    
+    // Reset form
+    form.reset();
+    setStartDate(undefined);
   }
 
   return (
@@ -144,6 +161,7 @@ const LeaveRequest = () => {
                               date < new Date(new Date().setHours(0, 0, 0, 0))
                             }
                             initialFocus
+                            className="pointer-events-auto"
                           />
                         </PopoverContent>
                       </Popover>
@@ -186,6 +204,7 @@ const LeaveRequest = () => {
                               startDate && date < startDate
                             }
                             initialFocus
+                            className="pointer-events-auto"
                           />
                         </PopoverContent>
                       </Popover>
@@ -214,6 +233,12 @@ const LeaveRequest = () => {
                     </FormItem>
                   )}
                 />
+                
+                <div className="mt-4">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Your request will be sent to: <span className="font-medium">{userProfile.supervisorName || "Your supervisor"}</span>
+                  </p>
+                </div>
                 
                 <Button type="submit">Submit Leave Request</Button>
               </form>

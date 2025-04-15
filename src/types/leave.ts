@@ -1,5 +1,6 @@
 
 export type LeaveType = 'PTO' | 'Sick' | 'Compassionate' | 'Maternity';
+export type LeaveStatus = 'Pending' | 'Approved' | 'Rejected';
 
 export interface LeaveBalance {
   type: LeaveType;
@@ -14,6 +15,21 @@ export interface LeaveRequest {
   startDate: string;
   endDate: string;
   reason: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
+  status: LeaveStatus;
   createdAt: string;
+  supervisorId?: string;
+  supervisorName?: string;
+  supervisorComment?: string;
+  reviewedAt?: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'employee' | 'supervisor' | 'admin';
+  department: string;
+  position: string;
+  supervisorId?: string;
+  supervisorName?: string;
 }

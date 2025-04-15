@@ -12,12 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import { LeaveRequest } from "@/types/leave";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 interface LeaveRequestListProps {
   requests: LeaveRequest[];
 }
 
 export function LeaveRequestList({ requests }: LeaveRequestListProps) {
+  const navigate = useNavigate();
+
   const getStatusBadgeStyle = (status: string) => {
     switch (status) {
       case "Approved":
@@ -41,6 +44,10 @@ export function LeaveRequestList({ requests }: LeaveRequestListProps) {
     return diffDays;
   };
 
+  const viewLeaveDetails = (id: string) => {
+    navigate(`/leave-details/${id}`);
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -55,27 +62,35 @@ export function LeaveRequestList({ requests }: LeaveRequestListProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {requests.map((request) => (
-            <TableRow key={request.id}>
-              <TableCell className="font-medium">{request.type}</TableCell>
-              <TableCell>{formatDate(request.startDate)}</TableCell>
-              <TableCell>{formatDate(request.endDate)}</TableCell>
-              <TableCell>
-                {calculateDuration(request.startDate, request.endDate)} days
-              </TableCell>
-              <TableCell>
-                <Badge className={getStatusBadgeStyle(request.status)}>
-                  {request.status}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button size="sm" variant="ghost">
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </Button>
+          {requests.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                No leave requests found
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            requests.map((request) => (
+              <TableRow key={request.id}>
+                <TableCell className="font-medium">{request.type}</TableCell>
+                <TableCell>{formatDate(request.startDate)}</TableCell>
+                <TableCell>{formatDate(request.endDate)}</TableCell>
+                <TableCell>
+                  {calculateDuration(request.startDate, request.endDate)} days
+                </TableCell>
+                <TableCell>
+                  <Badge className={getStatusBadgeStyle(request.status)}>
+                    {request.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button size="sm" variant="ghost" onClick={() => viewLeaveDetails(request.id)}>
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

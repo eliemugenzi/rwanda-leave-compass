@@ -11,6 +11,8 @@ import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import LeaveDetails from "./pages/LeaveDetails";
+import SupervisorDashboard from "./pages/SupervisorDashboard";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +26,8 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           <Route path="/request" element={<LeaveRequest />} />
           <Route path="/my-leaves" element={<MyLeaves />} />
+          <Route path="/leave-details/:id" element={<LeaveDetails />} />
+          <Route path="/supervisor-dashboard" element={<SupervisorDashboard />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />

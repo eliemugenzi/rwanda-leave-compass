@@ -8,7 +8,8 @@ import {
   FileText,
   User,
   LogOut,
-  Settings
+  Settings,
+  Users
 } from "lucide-react";
 
 import {
@@ -25,8 +26,11 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
+import { userProfile } from "@/data/mockData";
+
 export function AppSidebar() {
   const navigate = useNavigate();
+  const isSupervisor = userProfile.role === "supervisor" || userProfile.role === "admin";
   
   // Navigation items for the sidebar
   const mainNavItems = [
@@ -51,6 +55,15 @@ export function AppSidebar() {
       url: "/calendar",
     },
   ];
+
+  // If user is a supervisor, add the supervisor dashboard link
+  if (isSupervisor) {
+    mainNavItems.push({
+      title: "Supervisor Dashboard",
+      icon: Users,
+      url: "/supervisor-dashboard",
+    });
+  }
 
   const userNavItems = [
     {

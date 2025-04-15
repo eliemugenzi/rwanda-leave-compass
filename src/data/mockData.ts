@@ -1,15 +1,68 @@
 
-import { LeaveBalance, LeaveRequest } from "@/types/leave";
+import { LeaveBalance, LeaveRequest, User } from "@/types/leave";
 
-export const userProfile = {
+export const userProfile: User = {
   id: "user-001",
   name: "John Doe",
   email: "john.doe@example.com",
   department: "Engineering",
   position: "Software Developer",
-  joinDate: "2022-05-10",
-  imageUrl: "/placeholder.svg"
+  role: "employee",
+  supervisorId: "user-002",
+  supervisorName: "Sarah Johnson"
 };
+
+export const supervisors: User[] = [
+  {
+    id: "user-002",
+    name: "Sarah Johnson",
+    email: "sarah.johnson@example.com",
+    department: "Engineering",
+    position: "Engineering Manager",
+    role: "supervisor"
+  },
+  {
+    id: "user-003",
+    name: "Michael Brown",
+    email: "michael.brown@example.com",
+    department: "Product",
+    position: "Product Manager",
+    role: "supervisor"
+  }
+];
+
+export const employees: User[] = [
+  {
+    id: "user-001",
+    name: "John Doe",
+    email: "john.doe@example.com",
+    department: "Engineering",
+    position: "Software Developer",
+    role: "employee",
+    supervisorId: "user-002",
+    supervisorName: "Sarah Johnson"
+  },
+  {
+    id: "user-004",
+    name: "Emily Davis",
+    email: "emily.davis@example.com",
+    department: "Engineering",
+    position: "QA Engineer",
+    role: "employee",
+    supervisorId: "user-002",
+    supervisorName: "Sarah Johnson"
+  },
+  {
+    id: "user-005",
+    name: "Robert Wilson",
+    email: "robert.wilson@example.com",
+    department: "Product",
+    position: "Product Analyst",
+    role: "employee",
+    supervisorId: "user-003",
+    supervisorName: "Michael Brown"
+  }
+];
 
 export const mockLeaveBalances: LeaveBalance[] = [
   {
@@ -46,7 +99,11 @@ export const mockLeaveRequests: LeaveRequest[] = [
     endDate: "2023-08-15",
     reason: "Annual vacation",
     status: "Approved",
-    createdAt: "2023-07-20"
+    createdAt: "2023-07-20",
+    supervisorId: "user-002",
+    supervisorName: "Sarah Johnson",
+    supervisorComment: "Approved. Enjoy your vacation!",
+    reviewedAt: "2023-07-22"
   },
   {
     id: "leave-002",
@@ -55,7 +112,11 @@ export const mockLeaveRequests: LeaveRequest[] = [
     endDate: "2023-09-07",
     reason: "Flu",
     status: "Approved",
-    createdAt: "2023-09-05"
+    createdAt: "2023-09-05",
+    supervisorId: "user-002",
+    supervisorName: "Sarah Johnson",
+    supervisorComment: "Approved. Get well soon!",
+    reviewedAt: "2023-09-05"
   },
   {
     id: "leave-003",

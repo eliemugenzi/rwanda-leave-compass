@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -91,7 +92,7 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out'
 			},
       fontFamily: {
-        sans: ['GT Walsheim Pro', 'system-ui', 'sans-serif'],
+        sans: ['Poppins', 'system-ui', 'sans-serif'],
       },
 		}
 	},

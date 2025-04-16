@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,11 +11,20 @@ import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/pages-router/navigation";
 
 const LeaveDetails = () => {
-  const { id } = useParams<{ id: string }>();
   const router = useRouter();
   
+  // Extract ID from URL path
+  const [id, setId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Extract ID from the current pathname
+    const pathSegments = router.pathname.split('/');
+    const leaveId = pathSegments[pathSegments.length - 1];
+    setId(leaveId);
+  }, [router.pathname]);
+  
   // Find the leave request from our mock data
-  const leaveRequest = mockLeaveRequests.find(request => request.id === id);
+  const leaveRequest = id ? mockLeaveRequests.find(request => request.id === id) : null;
   
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);

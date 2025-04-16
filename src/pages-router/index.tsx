@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { routes } from './routes';
+import { RouterProvider } from './navigation';
 
 /**
  * Pages Router component that mimics Next.js routing based on file system
@@ -15,17 +16,11 @@ const PagesRouter: React.FC = () => {
     };
 
     window.addEventListener('popstate', handleRouteChange);
-    
-    // Add listener for custom navigation events
-    const handleCustomNavigation = () => {
-      setCurrentPath(window.location.pathname);
-    };
-
-    window.addEventListener('customNavigation', handleCustomNavigation);
+    window.addEventListener('customNavigation', handleRouteChange);
 
     return () => {
       window.removeEventListener('popstate', handleRouteChange);
-      window.removeEventListener('customNavigation', handleCustomNavigation);
+      window.removeEventListener('customNavigation', handleRouteChange);
     };
   }, []);
 
@@ -77,7 +72,11 @@ const PagesRouter: React.FC = () => {
     return <div>Page not found</div>;
   };
 
-  return <>{findRouteComponent()}</>;
+  return (
+    <RouterProvider>
+      {findRouteComponent()}
+    </RouterProvider>
+  );
 };
 
 export default PagesRouter;

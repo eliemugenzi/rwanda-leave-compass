@@ -1,25 +1,21 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
 
-const listeners: ((url: string) => void)[] = [];
-
-interface RouterState {
+// Define the type for the router context
+interface RouterContextType {
   pathname: string;
-  asPath: string;
+  push: (path: string) => void;
+  replace: (path: string) => void;
+  back: () => void;
   query: Record<string, string>;
 }
 
-let currentPath = window.location.pathname;
+// Create the context
+const RouterContext = createContext<RouterContextType | undefined>(undefined);
 
-/**
- * A navigation utility that mimics Next.js's useRouter
- */
-export const useRouter = () => {
-  const [routerState, setRouterState] = useState<RouterState>({
-    pathname: window.location.pathname,
-    asPath: window.location.pathname,
-    query: {}
-  });
+// Router provider component
+export const RouterProvider = ({ children }: { children: ReactNode }) => {
+  const [pathname, setPathname] = useState(window.location.pathname);
 
   // Parse URL parameters (similar to dynamic routes in Next.js)
   const extractParams = useCallback((currentPath: string, pattern: string): Record<string, string> => {
@@ -39,69 +35,73 @@ export const useRouter = () => {
     return params;
   }, []);
 
-  // Listen for URL changes
-  useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      const newState = {
-        pathname: url,
-        asPath: url,
-        query: {}
-      };
-      setRouterState(newState);
-    };
-
-    window.addEventListener('popstate', () => {
-      handleRouteChange(window.location.pathname);
+  // Extract URL query parameters
+  const getQueryParams = useCallback((): Record<string, string> => {
+    const query: Record<string, string> = {};
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    searchParams.forEach((value, key) => {
+      query[key] = value;
     });
-
-    listeners.push(handleRouteChange);
-
-    return () => {
-      const index = listeners.indexOf(handleRouteChange);
-      if (index > -1) {
-        listeners.splice(index, 1);
-      }
-    };
-  }, [extractParams]);
+    
+    return query;
+  }, []);
 
   const push = useCallback((path: string) => {
     window.history.pushState({}, '', path);
-    currentPath = path;
-    listeners.forEach(listener => listener(path));
+    setPathname(path);
+    // Dispatch a custom event to notify components about route change
+    window.dispatchEvent(new CustomEvent('customNavigation'));
   }, []);
 
   const replace = useCallback((path: string) => {
     window.history.replaceState({}, '', path);
-    currentPath = path;
-    listeners.forEach(listener => listener(path));
+    setPathname(path);
+    window.dispatchEvent(new CustomEvent('customNavigation'));
   }, []);
 
   const back = useCallback(() => {
     window.history.back();
   }, []);
 
-  // Extract any params from the current path
-  const params = useCallback(() => {
-    // Match the current path against known routes with parameters
-    // This is simplistic; you might need to enhance this for more complex route patterns
-    return {};
+  useEffect(() => {
+    const handlePopState = () => {
+      setPathname(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
 
-  return {
-    ...routerState,
+  const value = {
+    pathname,
     push,
     replace,
     back,
-    pathname: routerState.pathname,
-    query: routerState.query,
-    params: params(),
-    route: routerState.pathname,
+    query: getQueryParams(),
   };
+
+  return (
+    <RouterContext.Provider value={value}>
+      {children}
+    </RouterContext.Provider>
+  );
 };
 
-/**
- * Link component that mimics Next.js Link
- */
+// Hook to use the router
+export const useRouter = (): RouterContextType => {
+  const context = useContext(RouterContext);
+  
+  if (context === undefined) {
+    throw new Error('useRouter must be used within a RouterProvider');
+  }
+  
+  return context;
+};
+
+// Link component
 export const Link: React.FC<{
   href: string;
   className?: string;

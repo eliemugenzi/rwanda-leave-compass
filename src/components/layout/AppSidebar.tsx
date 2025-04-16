@@ -1,5 +1,4 @@
 
-import { useNavigate } from "react-router-dom";
 import {
   Calendar,
   Clock,
@@ -27,9 +26,9 @@ import {
 } from "@/components/ui/sidebar";
 
 import { userProfile } from "@/data/mockData";
+import { Link } from "@/pages-router/navigation";
 
 export function AppSidebar() {
-  const navigate = useNavigate();
   const isSupervisor = userProfile.role === "supervisor" || userProfile.role === "admin";
   
   // Navigation items for the sidebar
@@ -101,17 +100,10 @@ export function AppSidebar() {
               {mainNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a 
-                      href="#" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate(item.url);
-                      }}
-                      className="flex items-center"
-                    >
+                    <Link href={item.url} className="flex items-center">
                       <item.icon className="mr-2 h-4 w-4" />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -125,17 +117,10 @@ export function AppSidebar() {
               {userNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a 
-                      href="#" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate(item.url);
-                      }}
-                      className="flex items-center"
-                    >
+                    <Link href={item.url} className="flex items-center">
                       <item.icon className="mr-2 h-4 w-4" />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

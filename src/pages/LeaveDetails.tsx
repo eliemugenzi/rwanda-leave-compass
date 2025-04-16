@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,10 +9,11 @@ import { ArrowLeft, Calendar, Clock, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { mockLeaveRequests, userProfile } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
+import { useRouter } from "@/pages-router/navigation";
 
 const LeaveDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const router = useRouter();
   
   // Find the leave request from our mock data
   const leaveRequest = mockLeaveRequests.find(request => request.id === id);
@@ -27,7 +27,7 @@ const LeaveDetails = () => {
         <div className="flex flex-col items-center justify-center py-16">
           <h1 className="text-2xl font-bold mb-4">Leave Request Not Found</h1>
           <p className="text-muted-foreground mb-6">The requested leave details could not be found.</p>
-          <Button onClick={() => navigate("/my-leaves")}>
+          <Button onClick={() => router.push("/my-leaves")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Return to My Leaves
           </Button>
@@ -66,7 +66,7 @@ const LeaveDetails = () => {
         description: "The employee has been notified about your decision.",
       });
       setIsSubmitting(false);
-      navigate("/supervisor-dashboard");
+      router.push("/supervisor-dashboard");
     }, 1000);
   };
   
@@ -87,7 +87,7 @@ const LeaveDetails = () => {
         description: "The employee has been notified about your decision.",
       });
       setIsSubmitting(false);
-      navigate("/supervisor-dashboard");
+      router.push("/supervisor-dashboard");
     }, 1000);
   };
   
@@ -97,7 +97,7 @@ const LeaveDetails = () => {
   return (
     <AppLayout>
       <div className="flex items-center mb-6">
-        <Button variant="ghost" className="mr-4" onClick={() => navigate(-1)}>
+        <Button variant="ghost" className="mr-4" onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>

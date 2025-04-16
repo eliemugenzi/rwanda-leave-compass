@@ -1,5 +1,4 @@
 
-import { useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeaveBalanceCard } from "@/components/dashboard/LeaveBalanceCard";
 import { LeaveRequestList } from "@/components/leave/LeaveRequestList";
@@ -7,8 +6,11 @@ import { mockLeaveBalances, mockLeaveRequests, userProfile } from "@/data/mockDa
 import { Button } from "@/components/ui/button";
 import { Plus, Calendar } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { useRouter, Link } from "@/pages-router/navigation";
 
 const Dashboard = () => {
+  const router = useRouter();
+
   return (
     <AppLayout>
       <div className="flex items-center justify-between mb-6">
@@ -20,14 +22,14 @@ const Dashboard = () => {
           <Button 
             variant="outline" 
             className="flex gap-1"
-            onClick={() => window.location.href = '/calendar'}
+            onClick={() => router.push('/calendar')}
           >
             <Calendar className="h-4 w-4" />
             View Calendar
           </Button>
           <Button 
             className="flex gap-1"
-            onClick={() => window.location.href = '/request'}
+            onClick={() => router.push('/request')}
           >
             <Plus className="h-4 w-4" />
             Request Leave

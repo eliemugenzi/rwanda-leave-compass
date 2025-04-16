@@ -12,14 +12,14 @@ import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import { LeaveRequest } from "@/types/leave";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "@/pages-router/navigation";
 
 interface LeaveRequestListProps {
   requests: LeaveRequest[];
 }
 
 export function LeaveRequestList({ requests }: LeaveRequestListProps) {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const getStatusBadgeStyle = (status: string) => {
     switch (status) {
@@ -45,7 +45,7 @@ export function LeaveRequestList({ requests }: LeaveRequestListProps) {
   };
 
   const viewLeaveDetails = (id: string) => {
-    navigate(`/leave-details/${id}`);
+    router.push(`/leave-details/${id}`);
   };
 
   return (

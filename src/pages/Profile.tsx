@@ -8,6 +8,9 @@ import { userProfile, mockLeaveBalances } from "@/data/mockData";
 import { format } from "date-fns";
 
 const Profile = () => {
+  // Generate initials for avatar fallback
+  const initials = userProfile.name.split(' ').map(n => n[0]).join('');
+  
   return (
     <AppLayout>
       <div className="mb-6">
@@ -21,9 +24,9 @@ const Profile = () => {
             <CardContent className="pt-6">
               <div className="flex flex-col items-center justify-center space-y-3">
                 <Avatar className="h-24 w-24">
-                  <AvatarImage src={userProfile.imageUrl} alt={userProfile.name} />
+                  {/* Removed imageUrl that doesn't exist in the User type */}
                   <AvatarFallback className="text-2xl">
-                    {userProfile.name.split(' ').map(n => n[0]).join('')}
+                    {initials}
                   </AvatarFallback>
                 </Avatar>
                 <h2 className="text-2xl font-bold">{userProfile.name}</h2>
@@ -50,12 +53,12 @@ const Profile = () => {
                   <p className="text-base">{userProfile.position}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Date Joined</h3>
-                  <p className="text-base">{format(new Date(userProfile.joinDate), 'MMM dd, yyyy')}</p>
-                </div>
-                <div>
                   <h3 className="text-sm font-medium text-muted-foreground">Employee ID</h3>
                   <p className="text-base">{userProfile.id}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Role</h3>
+                  <p className="text-base capitalize">{userProfile.role}</p>
                 </div>
               </div>
 

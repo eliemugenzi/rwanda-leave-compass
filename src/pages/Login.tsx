@@ -68,7 +68,7 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen bg-muted/30">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Rwanda Leave Compass</CardTitle>
+          <CardTitle className="text-2xl">Time Away</CardTitle>
           <CardDescription>Sign in to access your leave management dashboard</CardDescription>
         </CardHeader>
         <CardContent>

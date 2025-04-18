@@ -1,4 +1,3 @@
-
 import Dashboard from '@/pages/Dashboard';
 import LeaveRequest from '@/pages/LeaveRequest';
 import MyLeaves from '@/pages/MyLeaves';
@@ -10,6 +9,7 @@ import LeaveDetails from '@/pages/LeaveDetails';
 import SupervisorDashboard from '@/pages/SupervisorDashboard';
 import Login from '@/pages/Login';
 import Logout from '@/pages/Logout';
+import SignUp from '@/pages/SignUp';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 interface RouteConfig {
@@ -118,6 +118,10 @@ export const routes: RouteConfig[] = [
   {
     path: '/login',
     component: Login,
+  },
+  {
+    path: '/signup',
+    component: SignUp,
   },
   {
     path: '/logout',

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Link } from '@/pages-router/navigation';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -109,8 +110,11 @@ const Login = () => {
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex justify-center text-sm text-muted-foreground">
-          <p>For demo purposes, you can use any email and password with at least 6 characters</p>
+        <CardFooter className="flex flex-col space-y-2 text-center text-sm text-muted-foreground">
+          <p>Don't have an account?</p>
+          <Link href="/signup" className="text-primary hover:underline">
+            Create an account
+          </Link>
         </CardFooter>
       </Card>
     </div>
@@ -118,3 +122,4 @@ const Login = () => {
 };
 
 export default Login;
+

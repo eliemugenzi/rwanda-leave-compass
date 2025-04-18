@@ -8,10 +8,17 @@ import Settings from '@/pages/Settings';
 import NotFound from '@/pages/NotFound';
 import LeaveDetails from '@/pages/LeaveDetails';
 import SupervisorDashboard from '@/pages/SupervisorDashboard';
+import Login from '@/pages/Login';
+import Logout from '@/pages/Logout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 interface RouteConfig {
   path: string;
   component: React.ComponentType<any>;
+  protection?: {
+    enabled: boolean;
+    roles?: string[];
+  };
 }
 
 /**
@@ -21,35 +28,100 @@ interface RouteConfig {
 export const routes: RouteConfig[] = [
   {
     path: '/',
-    component: Dashboard,
+    component: () => (
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
+    protection: {
+      enabled: true,
+    }
   },
   {
     path: '/request',
-    component: LeaveRequest,
+    component: () => (
+      <ProtectedRoute>
+        <LeaveRequest />
+      </ProtectedRoute>
+    ),
+    protection: {
+      enabled: true,
+    }
   },
   {
     path: '/my-leaves',
-    component: MyLeaves,
+    component: () => (
+      <ProtectedRoute>
+        <MyLeaves />
+      </ProtectedRoute>
+    ),
+    protection: {
+      enabled: true,
+    }
   },
   {
     path: '/leave-details/:id',
-    component: LeaveDetails,
+    component: () => (
+      <ProtectedRoute>
+        <LeaveDetails />
+      </ProtectedRoute>
+    ),
+    protection: {
+      enabled: true,
+    }
   },
   {
     path: '/supervisor-dashboard',
-    component: SupervisorDashboard,
+    component: () => (
+      <ProtectedRoute requiredRoles={['supervisor', 'admin']}>
+        <SupervisorDashboard />
+      </ProtectedRoute>
+    ),
+    protection: {
+      enabled: true,
+      roles: ['supervisor', 'admin'],
+    }
   },
   {
     path: '/calendar',
-    component: Calendar,
+    component: () => (
+      <ProtectedRoute>
+        <Calendar />
+      </ProtectedRoute>
+    ),
+    protection: {
+      enabled: true,
+    }
   },
   {
     path: '/profile',
-    component: Profile,
+    component: () => (
+      <ProtectedRoute>
+        <Profile />
+      </ProtectedRoute>
+    ),
+    protection: {
+      enabled: true,
+    }
   },
   {
     path: '/settings',
-    component: Settings,
+    component: () => (
+      <ProtectedRoute>
+        <Settings />
+      </ProtectedRoute>
+    ),
+    protection: {
+      enabled: true,
+    }
+  },
+  {
+    path: '/login',
+    component: Login,
+  },
+  {
+    path: '/logout',
+    component: Logout,
   },
   {
     path: '*',

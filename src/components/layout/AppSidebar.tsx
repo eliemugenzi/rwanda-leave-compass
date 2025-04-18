@@ -25,11 +25,13 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { userProfile } from "@/data/mockData";
 import { Link } from "@/pages-router/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export function AppSidebar() {
-  const isSupervisor = userProfile.role === "supervisor" || userProfile.role === "admin";
+  const { user } = useAuth();
+  
+  const isSupervisor = user?.role === "supervisor" || user?.role === "admin";
   
   // Navigation items for the sidebar
   const mainNavItems = [

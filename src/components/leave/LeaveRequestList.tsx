@@ -10,12 +10,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
-import { LeaveRequest } from "@/types/leave";
-import { format } from "date-fns";
 import { useRouter } from "@/pages-router/navigation";
+import { LeaveRequest as ApiLeaveRequest } from "@/services/api";
 
 interface LeaveRequestListProps {
-  requests: LeaveRequest[];
+  requests: ApiLeaveRequest[];
 }
 
 export function LeaveRequestList({ requests }: LeaveRequestListProps) {
@@ -23,9 +22,9 @@ export function LeaveRequestList({ requests }: LeaveRequestListProps) {
 
   const getStatusBadgeStyle = (status: string) => {
     switch (status) {
-      case "Approved":
+      case "APPROVED":
         return "bg-emerald-500 hover:bg-emerald-600";
-      case "Rejected":
+      case "REJECTED":
         return "bg-red-500 hover:bg-red-600";
       default:
         return "bg-amber-500 hover:bg-amber-600";
@@ -33,7 +32,16 @@ export function LeaveRequestList({ requests }: LeaveRequestListProps) {
   };
 
   const formatDate = (dateString: string) => {
-    return format(new Date(dateString), "MMM dd, yyyy");
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    } catch (e) {
+      console.error("Invalid date format:", dateString);
+      return dateString;
+    }
   };
 
   const calculateDuration = (startDate: string, endDate: string) => {

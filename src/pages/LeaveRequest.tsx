@@ -1,66 +1,12 @@
-import { useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { AppLayout } from "@/components/layout/AppLayout";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import { mockLeaveBalances, userProfile } from "@/data/mockData";
-import { toast } from "@/hooks/use-toast";
 
-const formSchema = z.object({
-  leaveType: z.string({
-    required_error: "Please select a leave type",
-  }),
-  startDate: z.date({
-    required_error: "Please select a start date",
-  }),
-  endDate: z.date({
-    required_error: "Please select an end date",
-  }),
-  reason: z.string().min(5, {
-    message: "Reason must be at least 5 characters",
-  }),
-});
+import { AppLayout } from "@/components/layout/AppLayout";
+import { toast } from "@/hooks/use-toast";
+import { LeaveRequestForm, LeaveRequestFormValues } from "@/components/leave/LeaveRequestForm";
+import { LeavePolicy } from "@/components/leave/LeavePolicy";
+import { userProfile } from "@/data/mockData";
 
 const LeaveRequest = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      reason: "",
-    },
-  });
-
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: LeaveRequestFormValues) {
     // In a real app, you would send this data to your backend
     const newLeaveRequest = {
       ...values,
@@ -75,10 +21,6 @@ const LeaveRequest = () => {
       title: "Leave request submitted",
       description: "Your request has been sent to your supervisor for approval.",
     });
-    
-    // Reset form
-    form.reset();
-    setStartDate(undefined);
   }
 
   return (
@@ -92,187 +34,8 @@ const LeaveRequest = () => {
 
       <div className="grid gap-6">
         <div className="grid gap-6 lg:grid-cols-2">
-          <div>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <FormField
-                  control={form.control}
-                  name="leaveType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Leave Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a leave type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Available Leave Types</SelectLabel>
-                            {mockLeaveBalances.map((balance) => (
-                              <SelectItem key={balance.type} value={balance.type}>
-                                {balance.type === 'ANNUAL' ? 'Annual Leave/PTO' : balance.type} ({balance.available} days available)
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="startDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Start Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={(date) => {
-                              field.onChange(date);
-                              setStartDate(date);
-                            }}
-                            disabled={(date) =>
-                              date < new Date(new Date().setHours(0, 0, 0, 0))
-                            }
-                            initialFocus
-                            className="pointer-events-auto"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="endDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>End Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              startDate && date < startDate
-                            }
-                            initialFocus
-                            className="pointer-events-auto"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="reason"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Reason</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Please provide a reason for your leave request"
-                          className="resize-none"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Please be specific about the reason for your leave.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="mt-4">
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Your request will be sent to: <span className="font-medium">{userProfile.supervisorName || "Your supervisor"}</span>
-                  </p>
-                </div>
-                
-                <Button type="submit">Submit Leave Request</Button>
-              </form>
-            </Form>
-          </div>
-          
-          <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-            <h3 className="font-semibold text-lg mb-4">Leave Policy Information</h3>
-            <div className="space-y-4 text-sm">
-              <div>
-                <h4 className="font-medium">Annual Leave/PTO</h4>
-                <p className="text-muted-foreground">
-                  Employees are entitled to 20 days of annual leave per year.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium">Sick Leave</h4>
-                <p className="text-muted-foreground">
-                  Up to 12 days of paid sick leave per year with medical certificate required for leaves exceeding 3 consecutive days.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium">Maternity Leave</h4>
-                <p className="text-muted-foreground">
-                  Female employees are entitled to 12 weeks (84 days) of paid maternity leave.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium">Paternity Leave</h4>
-                <p className="text-muted-foreground">
-                  Male employees are entitled to 2 weeks (14 days) of paid paternity leave.
-                </p>
-              </div>
-            </div>
-          </div>
+          <LeaveRequestForm onSubmit={onSubmit} />
+          <LeavePolicy />
         </div>
       </div>
     </AppLayout>

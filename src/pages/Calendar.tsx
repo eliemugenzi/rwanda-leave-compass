@@ -120,8 +120,18 @@ const Calendar = () => {
                 modifiers={{
                   booked: (date) => !!getLeaveInfo(date),
                 }}
-                classNames={{
-                  day_booked: getLeaveDayClassName,
+                components={{
+                  Day: (props) => {
+                    const isBooked = !!getLeaveInfo(props.date);
+                    return (
+                      <div
+                        className={`${props.className} ${isBooked ? getLeaveDayClassName(props.date) : ''}`}
+                        {...props.buttonProps}
+                      >
+                        {props.date.getDate()}
+                      </div>
+                    );
+                  },
                 }}
               />
             </CardContent>

@@ -1,3 +1,4 @@
+
 import { ApiResponse, Department, JobTitle } from '@/types/api';
 
 const BASE_URL = 'https://time-away-backend-production.up.railway.app/api/v1';
@@ -116,6 +117,9 @@ export interface LeaveRequest {
   approver: Approver | null;
   createdAt: string;
   updatedAt: string;
+  supervisorComment?: string;
+  supervisorName?: string;
+  reviewedAt?: string;
 }
 
 export async function fetchAllLeaveRequests(status?: string, page: number = 0, size: number = 10): Promise<LeaveRequestResponse> {

@@ -3,7 +3,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { toast } from "@/hooks/use-toast";
 import { LeaveRequestForm, LeaveRequestFormValues } from "@/components/leave/LeaveRequestForm";
 import { LeavePolicy } from "@/components/leave/LeavePolicy";
-import { userProfile } from "@/data/mockData";
+import { userProfile } from "@/data/temporaryMockData";
 
 const LeaveRequest = () => {
   function onSubmit(values: LeaveRequestFormValues) {

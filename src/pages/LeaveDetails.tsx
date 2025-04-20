@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -6,10 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Calendar, Clock, FileText } from "lucide-react";
 import { format } from "date-fns";
-import { mockLeaveRequests, userProfile } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/pages-router/navigation";
 import { LeaveStatus } from "@/types/leave";
+import { userProfile } from "@/data/temporaryMockData";
+import { useQuery } from "@tanstack/react-query";
+import { fetchUserLeaveRequests } from "@/services/api";
 
 const LeaveDetails = () => {
   // Extract ID from URL path
@@ -25,11 +28,26 @@ const LeaveDetails = () => {
     setId(leaveId);
   }, [router.pathname]);
   
-  // Find the leave request from our mock data
-  const leaveRequest = id ? mockLeaveRequests.find(request => request.id === id) : null;
+  // Fetch leave requests and find the one we want
+  const { data: leaveRequestsResponse, isLoading } = useQuery({
+    queryKey: ['leaveRequests', 'details'],
+    queryFn: () => fetchUserLeaveRequests(),
+  });
+  
+  const leaveRequest = id ? leaveRequestsResponse?.data.content.find(request => request.id === id) : null;
   
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center py-16">
+          <p>Loading leave request details...</p>
+        </div>
+      </AppLayout>
+    );
+  }
   
   if (!leaveRequest) {
     return (
@@ -102,7 +120,7 @@ const LeaveDetails = () => {
   };
   
   const isSupervisor = userProfile.role === "supervisor" || userProfile.role === "admin";
-  const isPending = leaveRequest?.status === LeaveStatus.PENDING;
+  const isPending = leaveRequest.status === LeaveStatus.PENDING;
 
   return (
     <AppLayout>

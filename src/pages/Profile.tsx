@@ -1,11 +1,9 @@
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { userProfile, mockLeaveBalances } from "@/data/mockData";
-import { format } from "date-fns";
+import { userProfile, mockLeaveBalances } from "@/data/temporaryMockData";
 
 const Profile = () => {
   // Generate initials for avatar fallback
@@ -24,7 +22,6 @@ const Profile = () => {
             <CardContent className="pt-6">
               <div className="flex flex-col items-center justify-center space-y-3">
                 <Avatar className="h-24 w-24">
-                  {/* Removed imageUrl that doesn't exist in the User type */}
                   <AvatarFallback className="text-2xl">
                     {initials}
                   </AvatarFallback>

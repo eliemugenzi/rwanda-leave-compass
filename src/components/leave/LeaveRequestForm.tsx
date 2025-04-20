@@ -32,8 +32,9 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { mockLeaveBalances, userProfile } from "@/data/mockData";
+import { LeaveType } from "@/types/leave";
 import { toast } from "@/hooks/use-toast";
+import { mockLeaveBalances, userProfile } from "@/data/temporaryMockData";
 
 const formSchema = z.object({
   leaveType: z.string({
@@ -92,7 +93,7 @@ export function LeaveRequestForm({ onSubmit }: LeaveRequestFormProps) {
                     <SelectLabel>Available Leave Types</SelectLabel>
                     {mockLeaveBalances.map((balance) => (
                       <SelectItem key={balance.type} value={balance.type}>
-                        {balance.type === 'ANNUAL' ? 'Annual Leave/PTO' : balance.type} ({balance.available} days available)
+                        {balance.type === LeaveType.ANNUAL ? 'Annual Leave/PTO' : balance.type} ({balance.available} days available)
                       </SelectItem>
                     ))}
                   </SelectGroup>

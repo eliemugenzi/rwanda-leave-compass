@@ -53,35 +53,33 @@ const Dashboard = () => {
     return <AdminDashboard />;
   }
 
-  const { data: leaveBalances } = useQuery({
-    queryKey: ['leaveBalances'],
-    queryFn: () => Promise.resolve([
-      {
-        type: LeaveType.ANNUAL,
-        available: 15,
-        used: 5,
-        total: 20
-      },
-      {
-        type: LeaveType.SICK,
-        available: 10,
-        used: 2,
-        total: 12
-      },
-      {
-        type: LeaveType.MATERNITY,
-        available: 84,
-        used: 0,
-        total: 84
-      },
-      {
-        type: LeaveType.PATERNITY,
-        available: 14,
-        used: 0,
-        total: 14
-      }
-    ]), // This will be replaced with the actual API call once available
-  });
+  // Temporary mock leave balances until we have an API endpoint
+  const leaveBalances = [
+    {
+      type: LeaveType.ANNUAL,
+      available: 15,
+      used: 5,
+      total: 20
+    },
+    {
+      type: LeaveType.SICK,
+      available: 10,
+      used: 2,
+      total: 12
+    },
+    {
+      type: LeaveType.MATERNITY,
+      available: 84,
+      used: 0,
+      total: 84
+    },
+    {
+      type: LeaveType.PATERNITY,
+      available: 14,
+      used: 0,
+      total: 14
+    }
+  ];
 
   // Regular user dashboard
   return (
@@ -120,7 +118,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {leaveBalances?.data.map((balance) => (
+              {leaveBalances.map((balance) => (
                 <LeaveBalanceCard key={balance.type} leaveBalance={balance} />
               ))}
             </div>

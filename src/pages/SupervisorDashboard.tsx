@@ -1,50 +1,41 @@
-
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockLeaveRequests as typedMockLeaveRequests, employees } from "@/data/mockData";
 import { LeaveRequestList } from "@/components/leave/LeaveRequestList";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Users } from "lucide-react";
 import { LeaveRequest } from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAllLeaveRequests } from "@/services/api";
+import { LeaveStatus } from "@/types/leave";
 
 const SupervisorDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
-  const totalPages = 1; // Since we're using mock data, we'll set this to 1
+  const pageSize = 10;
   
-  // Convert the mock data to match the API response structure
-  const mockLeaveRequests: LeaveRequest[] = typedMockLeaveRequests.map(leave => ({
-    id: leave.id,
-    employeeName: leave.supervisorName || "Employee Name",
-    type: leave.type,
-    startDate: leave.startDate,
-    endDate: leave.endDate,
-    reason: leave.reason,
-    status: leave.status.toUpperCase() as any,
-    rejectionReason: null,
-    approver: leave.supervisorId ? {
-      id: leave.supervisorId,
-      firstName: (leave.supervisorName || "").split(" ")[0] || "",
-      lastName: (leave.supervisorName || "").split(" ")[1] || "",
-      email: `${leave.supervisorName?.toLowerCase().replace(" ", ".")}@company.com` || "",
-    } : null,
-    createdAt: leave.createdAt,
-    updatedAt: leave.createdAt,
-  }));
+  const { data: leaveRequests, isLoading } = useQuery({
+    queryKey: ['leaveRequests', 'all', currentPage],
+    queryFn: () => fetchAllLeaveRequests(undefined, currentPage, pageSize),
+  });
+  
+  const requests = leaveRequests?.data.content || [];
   
   // Filter leaves by status for the supervisor view
-  const pendingLeaves = mockLeaveRequests.filter(
-    (leave) => leave.status === "PENDING"
+  const pendingLeaves = requests.filter(
+    (leave) => leave.status === LeaveStatus.PENDING
   );
-  const approvedLeaves = mockLeaveRequests.filter(
-    (leave) => leave.status === "APPROVED"
+  const approvedLeaves = requests.filter(
+    (leave) => leave.status === LeaveStatus.APPROVED
   );
-  const rejectedLeaves = mockLeaveRequests.filter(
-    (leave) => leave.status === "REJECTED"
+  const rejectedLeaves = requests.filter(
+    (leave) => leave.status === LeaveStatus.REJECTED
   );
+  
+  // For now, we're mocking the team members count
+  const teamMembersCount = 5;
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -75,7 +66,7 @@ const SupervisorDashboard = () => {
             <CardTitle className="text-lg">Team Members</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{employees.length}</div>
+            <div className="text-3xl font-bold">{teamMembersCount}</div>
             <p className="text-muted-foreground">Under your supervision</p>
           </CardContent>
         </Card>
@@ -135,7 +126,7 @@ const SupervisorDashboard = () => {
               <LeaveRequestList 
                 requests={pendingLeaves}
                 currentPage={currentPage}
-                totalPages={totalPages}
+                totalPages={leaveRequests?.data.totalPages || 0}
                 onPageChange={handlePageChange}
               />
             </TabsContent>
@@ -144,7 +135,7 @@ const SupervisorDashboard = () => {
               <LeaveRequestList 
                 requests={approvedLeaves}
                 currentPage={currentPage}
-                totalPages={totalPages}
+                totalPages={leaveRequests?.data.totalPages || 0}
                 onPageChange={handlePageChange}
               />
             </TabsContent>
@@ -153,7 +144,7 @@ const SupervisorDashboard = () => {
               <LeaveRequestList 
                 requests={rejectedLeaves}
                 currentPage={currentPage}
-                totalPages={totalPages}
+                totalPages={leaveRequests?.data.totalPages || 0}
                 onPageChange={handlePageChange}
               />
             </TabsContent>

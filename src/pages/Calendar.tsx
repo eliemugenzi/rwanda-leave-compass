@@ -115,11 +115,27 @@ const Calendar = () => {
                 className="rounded-md border w-full"
                 modifiersClassNames={{
                   selected: "bg-primary text-primary-foreground",
+                  booked: (date) => {
+                    const leaveInfo = getLeaveInfo(date);
+                    if (!leaveInfo) return "";
+                    
+                    switch (leaveInfo.type) {
+                      case LeaveType.ANNUAL:
+                        return "bg-primary/20 text-primary-foreground";
+                      case LeaveType.SICK:
+                        return "bg-amber-500/20 text-amber-900";
+                      case LeaveType.MATERNITY:
+                        return "bg-pink-500/20 text-pink-900";
+                      case LeaveType.PATERNITY:
+                        return "bg-emerald-500/20 text-emerald-900";
+                      default:
+                        return "";
+                    }
+                  }
                 }}
                 modifiers={{
                   booked: (date) => !!getLeaveInfo(date),
                 }}
-                dayClassName={dayClassName}
               />
             </CardContent>
           </Card>

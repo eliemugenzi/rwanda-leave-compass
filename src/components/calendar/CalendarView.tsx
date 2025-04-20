@@ -1,0 +1,52 @@
+
+import { DayProps } from "react-day-picker";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { format } from "date-fns";
+
+interface CalendarViewProps {
+  date: Date;
+  onDateSelect: (date: Date | undefined) => void;
+  getLeaveInfo: (date: Date) => { type: string; status: string; } | undefined;
+  getLeaveDayClassName: (date: Date) => string;
+}
+
+export const CalendarView = ({ date, onDateSelect, getLeaveInfo, getLeaveDayClassName }: CalendarViewProps) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Calendar View</CardTitle>
+        <CardDescription>
+          Colored dates indicate scheduled leaves
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <CalendarComponent
+          mode="single"
+          selected={date}
+          onSelect={onDateSelect}
+          className="rounded-md border w-full"
+          modifiersClassNames={{
+            selected: "bg-primary text-primary-foreground",
+          }}
+          modifiers={{
+            booked: (date) => !!getLeaveInfo(date),
+          }}
+          components={{
+            Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
+              const isBooked = !!getLeaveInfo(dayDate);
+              return (
+                <div
+                  className={`${props.className || ''} ${isBooked ? getLeaveDayClassName(dayDate) : ''}`}
+                  {...props}
+                >
+                  {dayDate.getDate()}
+                </div>
+              );
+            },
+          }}
+        />
+      </CardContent>
+    </Card>
+  );
+};

@@ -1,15 +1,23 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { LeaveRequestList } from "@/components/leave/LeaveRequestList";
-import { mockLeaveRequests } from "@/data/mockData";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { Check, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAllLeaveRequests } from "@/services/api";
 
 const AdminDashboard = () => {
   const { user } = useAuth();
-  const pendingRequests = mockLeaveRequests.filter(request => request.status === "Pending");
+  
+  const { data: allRequests, isLoading: isLoadingAll } = useQuery({
+    queryKey: ['leaveRequests', 'all'],
+    queryFn: () => fetchAllLeaveRequests(),
+  });
+
+  const { data: pendingRequests, isLoading: isLoadingPending } = useQuery({
+    queryKey: ['leaveRequests', 'pending'],
+    queryFn: () => fetchAllLeaveRequests('PENDING'),
+  });
 
   return (
     <AppLayout>
@@ -29,7 +37,11 @@ const AdminDashboard = () => {
             <CardDescription>Review and manage leave requests from employees</CardDescription>
           </CardHeader>
           <CardContent>
-            <LeaveRequestList requests={pendingRequests} />
+            {isLoadingPending ? (
+              <div className="text-center py-4">Loading pending requests...</div>
+            ) : (
+              <LeaveRequestList requests={pendingRequests?.data || []} />
+            )}
           </CardContent>
         </Card>
 
@@ -39,7 +51,11 @@ const AdminDashboard = () => {
             <CardDescription>View all leave requests history</CardDescription>
           </CardHeader>
           <CardContent>
-            <LeaveRequestList requests={mockLeaveRequests} />
+            {isLoadingAll ? (
+              <div className="text-center py-4">Loading all requests...</div>
+            ) : (
+              <LeaveRequestList requests={allRequests?.data || []} />
+            )}
           </CardContent>
         </Card>
       </div>

@@ -1,18 +1,25 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeaveBalanceCard } from "@/components/dashboard/LeaveBalanceCard";
 import { LeaveRequestList } from "@/components/leave/LeaveRequestList";
-import { mockLeaveBalances, mockLeaveRequests } from "@/data/mockData";
+import { mockLeaveBalances } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { Plus, Calendar } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useRouter } from "@/pages-router/navigation";
 import { useAuth } from "@/context/AuthContext";
 import AdminDashboard from "./AdminDashboard";
+import { useQuery } from "@tanstack/react-query";
+import { fetchUserLeaveRequests } from "@/services/api";
 
 const Dashboard = () => {
   const router = useRouter();
   const { user, isLoading } = useAuth();
+  
+  const { data: userLeaveRequests, isLoading: isLoadingRequests } = useQuery({
+    queryKey: ['leaveRequests', 'user'],
+    queryFn: () => fetchUserLeaveRequests(),
+    enabled: !!user && user.role === 'ROLE_USER',
+  });
 
   if (isLoading) {
     return (
@@ -91,7 +98,11 @@ const Dashboard = () => {
             <CardDescription>Your leave requests from the past 90 days</CardDescription>
           </CardHeader>
           <CardContent>
-            <LeaveRequestList requests={mockLeaveRequests} />
+            {isLoadingRequests ? (
+              <div className="text-center py-4">Loading your requests...</div>
+            ) : (
+              <LeaveRequestList requests={userLeaveRequests?.data || []} />
+            )}
           </CardContent>
         </Card>
       </div>

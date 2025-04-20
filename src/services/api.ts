@@ -1,4 +1,3 @@
-
 import { ApiResponse, Department, JobTitle } from '@/types/api';
 
 const BASE_URL = 'https://time-away-backend-production.up.railway.app/api/v1';
@@ -80,5 +79,71 @@ export async function getJobTitles(departmentId: string): Promise<ApiResponse<Jo
   if (!response.ok) {
     throw new Error('Failed to fetch job titles');
   }
+  return response.json();
+}
+
+export interface LeaveRequestResponse {
+  success: boolean;
+  message: string;
+  status: number;
+  data: LeaveRequest[];
+}
+
+export interface Approver {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface LeaveRequest {
+  id: string;
+  employeeName: string;
+  type: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  status: string;
+  rejectionReason: string | null;
+  approver: Approver | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function fetchAllLeaveRequests(status?: string): Promise<LeaveRequestResponse> {
+  const url = new URL(`${BASE_URL}/leave-requests`);
+  if (status) {
+    url.searchParams.append('status', status);
+  }
+  
+  const response = await fetch(url.toString(), {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    },
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch leave requests');
+  }
+  
+  return response.json();
+}
+
+export async function fetchUserLeaveRequests(status?: string): Promise<LeaveRequestResponse> {
+  const url = new URL(`${BASE_URL}/leave-requests/me`);
+  if (status) {
+    url.searchParams.append('status', status);
+  }
+  
+  const response = await fetch(url.toString(), {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    },
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch user leave requests');
+  }
+  
   return response.json();
 }

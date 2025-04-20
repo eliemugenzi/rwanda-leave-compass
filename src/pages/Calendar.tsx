@@ -1,12 +1,13 @@
 
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Calendar as CalendarComponent, CalendarProps } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { addDays, format, isBefore, isWithinInterval, parseISO } from "date-fns";
 import { LeaveType, LeaveStatus } from "@/types/leave";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllLeaveRequests } from "@/services/api";
+import { DayProps } from "react-day-picker";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
@@ -121,14 +122,14 @@ const Calendar = () => {
                   booked: (date) => !!getLeaveInfo(date),
                 }}
                 components={{
-                  Day: (props) => {
-                    const isBooked = !!getLeaveInfo(props.date);
+                  Day: ({ date: dayDate, ...props }: DayProps) => {
+                    const isBooked = !!getLeaveInfo(dayDate);
                     return (
                       <div
-                        className={`${props.className} ${isBooked ? getLeaveDayClassName(props.date) : ''}`}
-                        {...props.buttonProps}
+                        className={`${props.className || ''} ${isBooked ? getLeaveDayClassName(dayDate) : ''}`}
+                        {...props}
                       >
-                        {props.date.getDate()}
+                        {dayDate.getDate()}
                       </div>
                     );
                   },

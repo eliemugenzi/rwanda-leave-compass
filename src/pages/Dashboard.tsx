@@ -6,18 +6,40 @@ import { mockLeaveBalances, mockLeaveRequests } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { Plus, Calendar } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { useRouter, Link } from "@/pages-router/navigation";
+import { useRouter } from "@/pages-router/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 const Dashboard = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[200px]">
+          <p>Loading...</p>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (!user) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[200px]">
+          <p>Please log in to view your dashboard</p>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Welcome, {user?.name}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Welcome, {user.firstName} {user.lastName}
+          </h1>
           <p className="text-muted-foreground">Here's an overview of your leave status</p>
         </div>
         <div className="flex gap-3">

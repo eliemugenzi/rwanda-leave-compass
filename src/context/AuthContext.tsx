@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { loginUser } from '@/services/api';
 import { AuthContextType, AuthUser } from '@/types/auth';
@@ -22,24 +21,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const response = await loginUser({ email, password });
-      
-      console.log("API Response:", response); // Log the full response to see what we're getting
-      
-      // Extract user data, ensuring we handle missing data
-      // For now, using hardcoded values for testing if API doesn't return names
-      const firstName = response.data.firstName || 'John';
-      const lastName = response.data.lastName || 'Doe';
-      
+      console.log("API Response:", response);
+
+      if (!response.data.firstName || !response.data.lastName) {
+        console.error("Missing user data in response:", response.data);
+        return false;
+      }
+
       const authenticatedUser: AuthUser = {
         email: email,
-        firstName: firstName,
-        lastName: lastName,
-        name: `${firstName} ${lastName}`.trim(),
+        firstName: response.data.firstName,
+        lastName: response.data.lastName,
+        name: `${response.data.firstName} ${response.data.lastName}`.trim(),
         role: response.data.role || 'ROLE_USER'
       };
-      
-      console.log("Authenticated User:", authenticatedUser); // Log the user object we're saving
-      
+
+      console.log("Authenticated User:", authenticatedUser);
       storeUser(authenticatedUser);
       setUser(authenticatedUser);
       

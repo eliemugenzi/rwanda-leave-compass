@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -62,7 +63,7 @@ const Calendar = () => {
 
   const monthLeaves = getMonthLeaves();
 
-  // Classname generator for leave types - fixed to return string
+  // Classname generator for leave types
   const getLeaveDayClassName = (date: Date): string => {
     const leaveInfo = getLeaveInfo(date);
     if (!leaveInfo) return "";
@@ -115,10 +116,12 @@ const Calendar = () => {
                 className="rounded-md border w-full"
                 modifiersClassNames={{
                   selected: "bg-primary text-primary-foreground",
-                  booked: (date) => getLeaveDayClassName(date),
                 }}
                 modifiers={{
                   booked: (date) => !!getLeaveInfo(date),
+                }}
+                classNames={{
+                  day_booked: getLeaveDayClassName,
                 }}
               />
             </CardContent>

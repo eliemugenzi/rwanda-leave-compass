@@ -12,6 +12,7 @@ import { useRouter } from "@/pages-router/navigation";
 import { LeaveStatus } from "@/types/leave";
 
 const LeaveDetails = () => {
+  // Extract ID from URL path
   const router = useRouter();
   
   // Extract ID from URL path
@@ -58,9 +59,9 @@ const LeaveDetails = () => {
   
   const getStatusBadgeStyle = (status: string) => {
     switch (status) {
-      case "APPROVED":
+      case LeaveStatus.APPROVED:
         return "bg-emerald-500 hover:bg-emerald-600";
-      case "REJECTED":
+      case LeaveStatus.REJECTED:
         return "bg-red-500 hover:bg-red-600";
       default:
         return "bg-amber-500 hover:bg-amber-600";
@@ -101,7 +102,7 @@ const LeaveDetails = () => {
   };
   
   const isSupervisor = userProfile.role === "supervisor" || userProfile.role === "admin";
-  const isPending = leaveRequest.status === LeaveStatus.PENDING;
+  const isPending = leaveRequest?.status === LeaveStatus.PENDING;
 
   return (
     <AppLayout>

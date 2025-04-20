@@ -1,5 +1,16 @@
-export type LeaveType = 'ANNUAL' | 'SICK' | 'MATERNITY' | 'PATERNITY';
-export type LeaveStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export enum LeaveType {
+  ANNUAL = 'ANNUAL',
+  SICK = 'SICK',
+  MATERNITY = 'MATERNITY',
+  PATERNITY = 'PATERNITY'
+}
+
+export enum LeaveStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED'
+}
 
 export interface LeaveBalance {
   type: LeaveType;

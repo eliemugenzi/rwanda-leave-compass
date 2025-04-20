@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -47,13 +46,13 @@ const Calendar = () => {
     if (!leaveInfo) return "";
     
     switch (leaveInfo.type) {
-      case "ANNUAL":
+      case LeaveType.ANNUAL:
         return "bg-primary/20 text-primary-foreground hover:bg-primary/30";
-      case "SICK":
+      case LeaveType.SICK:
         return "bg-amber-500/20 text-amber-900 hover:bg-amber-500/30";
-      case "MATERNITY":
+      case LeaveType.MATERNITY:
         return "bg-pink-500/20 text-pink-900 hover:bg-pink-500/30";
-      case "PATERNITY":
+      case LeaveType.PATERNITY:
         return "bg-emerald-500/20 text-emerald-900 hover:bg-emerald-500/30";
       default:
         return "";
@@ -150,14 +149,14 @@ const Calendar = () => {
                     <div key={leave.id} className="border-l-4 pl-3 py-2" 
                       style={{ 
                         borderColor: 
-                          leave.type === 'ANNUAL' ? 'hsl(262, 83%, 58%)' : 
-                          leave.type === 'SICK' ? '#f59e0b' :
-                          leave.type === 'MATERNITY' ? '#ec4899' : '#10b981'
+                          leave.type === LeaveType.ANNUAL ? 'hsl(262, 83%, 58%)' : 
+                          leave.type === LeaveType.SICK ? '#f59e0b' :
+                          leave.type === LeaveType.MATERNITY ? '#ec4899' : '#10b981'
                       }}>
                       <div className="font-medium">
-                        {leave.type === 'ANNUAL' ? 'Annual Leave/PTO' :
-                         leave.type === 'SICK' ? 'Sick Leave' :
-                         leave.type === 'MATERNITY' ? 'Maternity Leave' : 'Paternity Leave'}
+                        {leave.type === LeaveType.ANNUAL ? 'Annual Leave/PTO' :
+                         leave.type === LeaveType.SICK ? 'Sick Leave' :
+                         leave.type === LeaveType.MATERNITY ? 'Maternity Leave' : 'Paternity Leave'}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {format(parseISO(leave.startDate), 'MMM dd')} - {format(parseISO(leave.endDate), 'MMM dd, yyyy')}

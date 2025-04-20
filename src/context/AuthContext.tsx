@@ -1,17 +1,13 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { userProfile } from '@/data/mockData';
 import { loginUser } from '@/services/api';
 
 // Define the user type
 export interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  department: string;
-  position: string;
   firstName: string;
   lastName: string;
+  name: string;
+  email: string;
 }
 
 // Define the auth context type
@@ -45,11 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await loginUser({ email, password });
       
       const authenticatedUser: AuthUser = {
-        id: 'user-id', // This would come from your backend in a real app
         email: email,
-        role: 'employee',
-        department: 'Technology',
-        position: 'Software Developer',
         firstName: response.data.firstName,
         lastName: response.data.lastName,
         name: `${response.data.firstName} ${response.data.lastName}`
@@ -87,3 +79,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

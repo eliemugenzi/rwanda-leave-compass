@@ -1,4 +1,3 @@
-
 import { LeaveBalance, LeaveRequest, User } from "@/types/leave";
 
 export const userProfile: User = {

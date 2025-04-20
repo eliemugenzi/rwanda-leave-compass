@@ -1,6 +1,5 @@
-
-export type LeaveType = 'PTO' | 'Sick' | 'Compassionate' | 'Maternity';
-export type LeaveStatus = 'Pending' | 'Approved' | 'Rejected';
+export type LeaveType = 'ANNUAL' | 'SICK' | 'MATERNITY' | 'PATERNITY';
+export type LeaveStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface LeaveBalance {
   type: LeaveType;

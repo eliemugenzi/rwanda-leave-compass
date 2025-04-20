@@ -65,39 +65,39 @@ export const employees: User[] = [
 
 export const mockLeaveBalances: LeaveBalance[] = [
   {
-    type: "PTO",
+    type: "ANNUAL",
     available: 15,
     used: 5,
     total: 20
   },
   {
-    type: "Sick",
+    type: "SICK",
     available: 10,
     used: 2,
     total: 12
   },
   {
-    type: "Compassionate",
-    available: 7,
-    used: 0,
-    total: 7
-  },
-  {
-    type: "Maternity",
+    type: "MATERNITY",
     available: 84,
     used: 0,
     total: 84
+  },
+  {
+    type: "PATERNITY",
+    available: 14,
+    used: 0,
+    total: 14
   }
 ];
 
 export const mockLeaveRequests: LeaveRequest[] = [
   {
     id: "leave-001",
-    type: "PTO",
+    type: "ANNUAL",
     startDate: "2023-08-10",
     endDate: "2023-08-15",
     reason: "Annual vacation",
-    status: "Approved",
+    status: "APPROVED",
     createdAt: "2023-07-20",
     supervisorId: "user-002",
     supervisorName: "Sarah Johnson",
@@ -106,11 +106,11 @@ export const mockLeaveRequests: LeaveRequest[] = [
   },
   {
     id: "leave-002",
-    type: "Sick",
+    type: "SICK",
     startDate: "2023-09-05",
     endDate: "2023-09-07",
     reason: "Flu",
-    status: "Approved",
+    status: "APPROVED",
     createdAt: "2023-09-05",
     supervisorId: "user-002",
     supervisorName: "Sarah Johnson",
@@ -119,11 +119,11 @@ export const mockLeaveRequests: LeaveRequest[] = [
   },
   {
     id: "leave-003",
-    type: "PTO",
+    type: "ANNUAL",
     startDate: "2023-12-22",
     endDate: "2023-12-31",
     reason: "Holiday break",
-    status: "Pending",
+    status: "PENDING",
     createdAt: "2023-11-15"
   },
 ];

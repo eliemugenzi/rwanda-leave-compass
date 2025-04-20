@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -113,7 +112,7 @@ const LeaveRequest = () => {
                             <SelectLabel>Available Leave Types</SelectLabel>
                             {mockLeaveBalances.map((balance) => (
                               <SelectItem key={balance.type} value={balance.type}>
-                                {balance.type} ({balance.available} days available)
+                                {balance.type === 'ANNUAL' ? 'Annual Leave/PTO' : balance.type} ({balance.available} days available)
                               </SelectItem>
                             ))}
                           </SelectGroup>
@@ -249,9 +248,9 @@ const LeaveRequest = () => {
             <h3 className="font-semibold text-lg mb-4">Leave Policy Information</h3>
             <div className="space-y-4 text-sm">
               <div>
-                <h4 className="font-medium">Personal Time Off (PTO)</h4>
+                <h4 className="font-medium">Annual Leave/PTO</h4>
                 <p className="text-muted-foreground">
-                  Employees are entitled to 20 days of personal time off per year.
+                  Employees are entitled to 20 days of annual leave per year.
                 </p>
               </div>
               <div>
@@ -261,15 +260,15 @@ const LeaveRequest = () => {
                 </p>
               </div>
               <div>
-                <h4 className="font-medium">Compassionate Leave</h4>
+                <h4 className="font-medium">Maternity Leave</h4>
                 <p className="text-muted-foreground">
-                  Up to 7 days in case of death of a spouse, child, parent or sibling.
+                  Female employees are entitled to 12 weeks (84 days) of paid maternity leave.
                 </p>
               </div>
               <div>
-                <h4 className="font-medium">Maternity Leave</h4>
+                <h4 className="font-medium">Paternity Leave</h4>
                 <p className="text-muted-foreground">
-                  Female employees are entitled to 12 weeks (84 days) of paid maternity leave per Rwandan labor law.
+                  Male employees are entitled to 2 weeks (14 days) of paid paternity leave.
                 </p>
               </div>
             </div>

@@ -25,15 +25,7 @@ export const useLoginForm = () => {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const response = await loginUser({
-        email: data.email,
-        password: data.password,
-      });
-
-      if (response.data.accessToken) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-      }
-
+      // We'll let the AuthContext handle token storage
       const success = await login(data.email, data.password);
       
       if (success) {

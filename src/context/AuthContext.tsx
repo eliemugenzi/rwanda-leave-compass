@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { loginUser } from '@/services/api';
 import { AuthContextType, AuthUser } from '@/types/auth';
@@ -8,7 +9,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { getStoredUser, storeUser, removeUser } = useAuthStorage();
+  const { 
+    getStoredUser, 
+    storeUser, 
+    removeUser, 
+    getToken, 
+    storeToken, 
+    removeToken 
+  } = useAuthStorage();
 
   useEffect(() => {
     const storedUser = getStoredUser();
@@ -26,6 +34,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!response.data.firstName || !response.data.lastName) {
         console.error("Missing user data in response:", response.data);
         return false;
+      }
+
+      // Store the access token
+      if (response.data.accessToken) {
+        storeToken(response.data.accessToken);
       }
 
       const authenticatedUser: AuthUser = {
@@ -49,6 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     removeUser();
+    removeToken();
     setUser(null);
   };
 

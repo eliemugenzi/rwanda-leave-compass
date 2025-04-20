@@ -1,6 +1,12 @@
+
 import { ApiResponse, Department, JobTitle } from '@/types/api';
 
 const BASE_URL = 'https://time-away-backend-production.up.railway.app/api/v1';
+
+// Helper function to get the authentication token
+const getAuthToken = (): string | null => {
+  return localStorage.getItem('accessToken');
+};
 
 export interface RegisterPayload {
   firstName: string;
@@ -131,7 +137,7 @@ export async function fetchAllLeaveRequests(status?: string, page: number = 0, s
   
   const response = await fetch(url.toString(), {
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Authorization': `Bearer ${getAuthToken()}`,
     },
   });
   
@@ -152,7 +158,7 @@ export async function fetchUserLeaveRequests(status?: string, page: number = 0, 
   
   const response = await fetch(url.toString(), {
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Authorization': `Bearer ${getAuthToken()}`,
     },
   });
   
@@ -176,7 +182,7 @@ export interface LeaveBalanceResponse {
 export async function fetchLeaveBalances(): Promise<LeaveBalanceResponse> {
   const response = await fetch(`${BASE_URL}/leave-balances/me`, {
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Authorization': `Bearer ${getAuthToken()}`,
     },
   });
   

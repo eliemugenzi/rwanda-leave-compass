@@ -12,6 +12,8 @@ import { LeaveRequest } from "@/services/api";
 
 const SupervisorDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const totalPages = 1; // Since we're using mock data, we'll set this to 1
   
   // Convert the mock data to match the API response structure
   const mockLeaveRequests: LeaveRequest[] = typedMockLeaveRequests.map(leave => ({
@@ -43,6 +45,10 @@ const SupervisorDashboard = () => {
   const rejectedLeaves = mockLeaveRequests.filter(
     (leave) => leave.status === "REJECTED"
   );
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   return (
     <AppLayout>
@@ -126,15 +132,30 @@ const SupervisorDashboard = () => {
             </TabsList>
             
             <TabsContent value="pending" className="mt-6">
-              <LeaveRequestList requests={pendingLeaves} />
+              <LeaveRequestList 
+                requests={pendingLeaves}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
             </TabsContent>
             
             <TabsContent value="approved" className="mt-6">
-              <LeaveRequestList requests={approvedLeaves} />
+              <LeaveRequestList 
+                requests={approvedLeaves}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
             </TabsContent>
             
             <TabsContent value="rejected" className="mt-6">
-              <LeaveRequestList requests={rejectedLeaves} />
+              <LeaveRequestList 
+                requests={rejectedLeaves}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>

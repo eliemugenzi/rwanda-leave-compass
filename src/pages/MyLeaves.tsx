@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -37,6 +38,13 @@ const MyLeaves = () => {
   const rejectedLeaves = mockLeaveRequests.filter(
     (leave) => leave.status === "REJECTED"
   );
+  
+  const [currentPage, setCurrentPage] = useState(0);
+  const totalPages = 1; // Since we're using mock data, we'll set this to 1
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   return (
     <AppLayout>
@@ -70,12 +78,22 @@ const MyLeaves = () => {
             </TabsList>
             
             <TabsContent value="all" className="mt-6">
-              <LeaveRequestList requests={mockLeaveRequests} />
+              <LeaveRequestList 
+                requests={mockLeaveRequests} 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
             </TabsContent>
             
             <TabsContent value="pending" className="mt-6">
               {pendingLeaves.length > 0 ? (
-                <LeaveRequestList requests={pendingLeaves} />
+                <LeaveRequestList 
+                  requests={pendingLeaves} 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   No pending leave requests found
@@ -85,7 +103,12 @@ const MyLeaves = () => {
             
             <TabsContent value="approved" className="mt-6">
               {approvedLeaves.length > 0 ? (
-                <LeaveRequestList requests={approvedLeaves} />
+                <LeaveRequestList 
+                  requests={approvedLeaves} 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   No approved leave requests found
@@ -95,7 +118,12 @@ const MyLeaves = () => {
             
             <TabsContent value="rejected" className="mt-6">
               {rejectedLeaves.length > 0 ? (
-                <LeaveRequestList requests={rejectedLeaves} />
+                <LeaveRequestList 
+                  requests={rejectedLeaves} 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   No rejected leave requests found

@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeaveBalanceCard } from "@/components/dashboard/LeaveBalanceCard";
 import { LeaveRequestList } from "@/components/leave/LeaveRequestList";
@@ -15,12 +16,18 @@ import { fetchUserLeaveRequests } from "@/services/api";
 const Dashboard = () => {
   const router = useRouter();
   const { user, isLoading } = useAuth();
+  const [currentPage, setCurrentPage] = useState(0);
+  const pageSize = 10;
   
   const { data: userLeaveRequests, isLoading: isLoadingRequests } = useQuery({
-    queryKey: ['leaveRequests', 'user'],
-    queryFn: () => fetchUserLeaveRequests(),
+    queryKey: ['leaveRequests', 'user', currentPage],
+    queryFn: () => fetchUserLeaveRequests(undefined, currentPage, pageSize),
     enabled: !!user && user.role === 'ROLE_USER',
   });
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   if (isLoading) {
     return (
@@ -102,7 +109,12 @@ const Dashboard = () => {
             {isLoadingRequests ? (
               <div className="text-center py-4">Loading your requests...</div>
             ) : (
-              <LeaveRequestList requests={userLeaveRequests?.data || []} />
+              <LeaveRequestList 
+                requests={userLeaveRequests?.data.content || []} 
+                currentPage={currentPage}
+                totalPages={userLeaveRequests?.data.totalPages || 0}
+                onPageChange={handlePageChange}
+              />
             )}
           </CardContent>
         </Card>

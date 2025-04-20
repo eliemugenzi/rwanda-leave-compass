@@ -23,16 +23,16 @@ import {
 
 interface LeaveRequestListProps {
   requests: LeaveRequest[];
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
+  currentPage?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
 }
 
 export function LeaveRequestList({ 
   requests,
-  currentPage,
-  totalPages,
-  onPageChange,
+  currentPage = 0,
+  totalPages = 1,
+  onPageChange = () => {},
 }: LeaveRequestListProps) {
   const router = useRouter();
 

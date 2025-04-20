@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useRouter } from '@/pages-router/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -12,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '@/hooks/use-toast';
 import { Logo } from '@/components/layout/Logo';
+import { loginUser, AuthResponse } from '@/services/api';
 
 // Form validation schema
 const formSchema = z.object({
@@ -40,6 +40,16 @@ const Login = () => {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
+      const response: AuthResponse = await loginUser({
+        email: data.email,
+        password: data.password,
+      });
+
+      // Save the access token to localStorage
+      if (response.data.accessToken) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+      }
+
       const success = await login(data.email, data.password);
       
       if (success) {
@@ -48,17 +58,26 @@ const Login = () => {
           description: 'Welcome back!',
         });
         router.push('/');
-      } else {
-        toast({
-          title: 'Login failed',
-          description: 'Invalid email or password. Please try again.',
-          variant: 'destructive',
-        });
       }
     } catch (error) {
+      console.error('Login error:', error);
+      let errorMessage = 'Invalid email or password. Please try again.';
+      
+      if (error instanceof Error) {
+        try {
+          const parsedError = JSON.parse(error.message);
+          if (parsedError && parsedError.message) {
+            errorMessage = parsedError.message;
+          }
+        } catch (e) {
+          // If parsing fails, use the original error message
+          errorMessage = error.message;
+        }
+      }
+
       toast({
-        title: 'Login error',
-        description: 'An unexpected error occurred. Please try again.',
+        title: 'Login failed',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

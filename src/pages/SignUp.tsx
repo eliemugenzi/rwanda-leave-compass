@@ -38,6 +38,16 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+interface AuthResponse {
+  message: string;
+  status: number;
+  data: {
+    accessToken: string;
+    refreshToken: string;
+    tokenType: string | null;
+  };
+}
+
 const SignUp = () => {
   const { login } = useAuth();
   const router = useRouter();
@@ -79,7 +89,7 @@ const SignUp = () => {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      await registerUser({
+      const response: AuthResponse = await registerUser({
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
@@ -88,6 +98,11 @@ const SignUp = () => {
         jobTitleId: data.jobTitleId,
         role: 'ROLE_USER',
       });
+      
+      // Save the access token to localStorage
+      if (response.data.accessToken) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+      }
       
       const success = await login(data.email, data.password);
       

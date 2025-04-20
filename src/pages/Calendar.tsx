@@ -115,13 +115,10 @@ const Calendar = () => {
                 className="rounded-md border w-full"
                 modifiersClassNames={{
                   selected: "bg-primary text-primary-foreground",
-                  // Changed this to be a string, using our helper function in the modifiers section
+                  booked: (date) => getLeaveDayClassName(date),
                 }}
                 modifiers={{
                   booked: (date) => !!getLeaveInfo(date),
-                }}
-                styles={{
-                  day_booked: (date) => getLeaveDayClassName(date),
                 }}
               />
             </CardContent>

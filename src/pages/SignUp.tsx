@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useRouter } from '@/pages-router/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -98,13 +99,14 @@ const SignUp = () => {
         router.push('/');
       }
     } catch (error) {
+      console.error('Registration error:', error);
       // Extract the error message from the API response
       let errorMessage = 'An error occurred during registration. Please try again.';
       
       if (error instanceof Error) {
         try {
           const parsedError = JSON.parse(error.message);
-          if (parsedError.message) {
+          if (parsedError && parsedError.message) {
             errorMessage = parsedError.message;
           }
         } catch (e) {

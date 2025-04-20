@@ -22,11 +22,13 @@ export async function registerUser(payload: RegisterPayload) {
     body: JSON.stringify(payload),
   });
   
+  const data = await response.json();
+  
   if (!response.ok) {
-    throw new Error('Registration failed');
+    throw new Error(JSON.stringify(data));
   }
   
-  return response.json();
+  return data;
 }
 
 export async function getDepartments(): Promise<ApiResponse<Department[]>> {

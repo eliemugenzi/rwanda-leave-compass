@@ -1,46 +1,35 @@
-
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LeaveRequestList } from "@/components/leave/LeaveRequestList";
-import { mockLeaveRequests as typedMockLeaveRequests } from "@/data/mockData";
-import { LeaveRequest } from "@/services/api";
-
-// Convert the mock data to match the API response structure
-const mockLeaveRequests: LeaveRequest[] = typedMockLeaveRequests.map(leave => ({
-  id: leave.id,
-  employeeName: leave.supervisorName || "Employee Name",
-  type: leave.type,
-  startDate: leave.startDate,
-  endDate: leave.endDate,
-  reason: leave.reason,
-  status: leave.status.toUpperCase() as any,
-  rejectionReason: null,
-  approver: leave.supervisorId ? {
-    id: leave.supervisorId,
-    firstName: (leave.supervisorName || "").split(" ")[0] || "",
-    lastName: (leave.supervisorName || "").split(" ")[1] || "",
-    email: `${leave.supervisorName?.toLowerCase().replace(" ", ".")}@company.com` || "",
-  } : null,
-  createdAt: leave.createdAt,
-  updatedAt: leave.createdAt,
-}));
+import { useQuery } from "@tanstack/react-query";
+import { fetchUserLeaveRequests } from "@/services/api";
+import { LeaveStatus } from "@/types/leave";
 
 const MyLeaves = () => {
-  // Filter leaves by status
-  const pendingLeaves = mockLeaveRequests.filter(
-    (leave) => leave.status === "PENDING"
-  );
-  const approvedLeaves = mockLeaveRequests.filter(
-    (leave) => leave.status === "APPROVED"
-  );
-  const rejectedLeaves = mockLeaveRequests.filter(
-    (leave) => leave.status === "REJECTED"
-  );
-  
   const [currentPage, setCurrentPage] = useState(0);
-  const totalPages = 1; // Since we're using mock data, we'll set this to 1
+  const pageSize = 10;
+
+  const { data: userLeaveRequests, isLoading } = useQuery({
+    queryKey: ['leaveRequests', 'user', currentPage],
+    queryFn: () => fetchUserLeaveRequests(undefined, currentPage, pageSize),
+  });
+
+  const requests = userLeaveRequests?.data.content || [];
+  
+  // Filter leaves by status
+  const pendingLeaves = requests.filter(
+    (leave) => leave.status === LeaveStatus.PENDING
+  );
+  const approvedLeaves = requests.filter(
+    (leave) => leave.status === LeaveStatus.APPROVED
+  );
+  const rejectedLeaves = requests.filter(
+    (leave) => leave.status === LeaveStatus.REJECTED
+  );
+
+  const totalPages = userLeaveRequests?.data.totalPages || 0;
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -79,7 +68,7 @@ const MyLeaves = () => {
             
             <TabsContent value="all" className="mt-6">
               <LeaveRequestList 
-                requests={mockLeaveRequests} 
+                requests={requests} 
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}

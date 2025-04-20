@@ -2,12 +2,18 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockLeaveRequests } from "@/data/mockData";
 import { addDays, format, isBefore, isWithinInterval, parseISO } from "date-fns";
 import { LeaveType, LeaveStatus } from "@/types/leave";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAllLeaveRequests } from "@/services/api";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
+  
+  const { data: leaveRequests, isLoading } = useQuery({
+    queryKey: ['leaveRequests', 'calendar'],
+    queryFn: () => fetchAllLeaveRequests(),
+  });
 
   // Helper function to get all dates in a date range
   const getDatesInRange = (startDate: string, endDate: string) => {
@@ -25,7 +31,7 @@ const Calendar = () => {
   };
 
   // Generate all leave dates
-  const allLeaveDates = mockLeaveRequests.flatMap((request) => {
+  const allLeaveDates = (leaveRequests?.data.content || []).flatMap((request) => {
     const dates = getDatesInRange(request.startDate, request.endDate);
     return dates.map((date) => ({
       date,
@@ -63,11 +69,10 @@ const Calendar = () => {
     const currentMonthStart = new Date(date.getFullYear(), date.getMonth(), 1);
     const currentMonthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     
-    return mockLeaveRequests.filter((request) => {
+    return (leaveRequests?.data.content || []).filter((request) => {
       const startDate = parseISO(request.startDate);
       const endDate = parseISO(request.endDate);
       
-      // Check if the leave request overlaps with the current month
       return isWithinInterval(startDate, { start: currentMonthStart, end: currentMonthEnd }) ||
              isWithinInterval(endDate, { start: currentMonthStart, end: currentMonthEnd }) ||
              (isBefore(startDate, currentMonthStart) && isBefore(currentMonthEnd, endDate));
@@ -75,6 +80,16 @@ const Calendar = () => {
   };
 
   const monthLeaves = getMonthLeaves();
+
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <p>Loading calendar...</p>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
@@ -104,6 +119,7 @@ const Calendar = () => {
                 modifiers={{
                   booked: (date) => !!getLeaveInfo(date),
                 }}
+                dayClassName={dayClassName}
               />
             </CardContent>
           </Card>

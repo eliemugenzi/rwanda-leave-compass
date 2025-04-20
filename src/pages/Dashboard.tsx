@@ -1,9 +1,7 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeaveBalanceCard } from "@/components/dashboard/LeaveBalanceCard";
 import { LeaveRequestList } from "@/components/leave/LeaveRequestList";
-import { mockLeaveBalances } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { Plus, Calendar } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -11,6 +9,7 @@ import { useRouter } from "@/pages-router/navigation";
 import { useAuth } from "@/context/AuthContext";
 import AdminDashboard from "./AdminDashboard";
 import { useQuery } from "@tanstack/react-query";
+import { LeaveType } from "@/types/leave";
 import { fetchUserLeaveRequests } from "@/services/api";
 
 const Dashboard = () => {
@@ -54,6 +53,36 @@ const Dashboard = () => {
     return <AdminDashboard />;
   }
 
+  const { data: leaveBalances } = useQuery({
+    queryKey: ['leaveBalances'],
+    queryFn: () => Promise.resolve([
+      {
+        type: LeaveType.ANNUAL,
+        available: 15,
+        used: 5,
+        total: 20
+      },
+      {
+        type: LeaveType.SICK,
+        available: 10,
+        used: 2,
+        total: 12
+      },
+      {
+        type: LeaveType.MATERNITY,
+        available: 84,
+        used: 0,
+        total: 84
+      },
+      {
+        type: LeaveType.PATERNITY,
+        available: 14,
+        used: 0,
+        total: 14
+      }
+    ]), // This will be replaced with the actual API call once available
+  });
+
   // Regular user dashboard
   return (
     <AppLayout>
@@ -91,7 +120,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {mockLeaveBalances.map((balance) => (
+              {leaveBalances?.data.map((balance) => (
                 <LeaveBalanceCard key={balance.type} leaveBalance={balance} />
               ))}
             </div>

@@ -78,7 +78,6 @@ const SignUp = () => {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      // Fix: Ensure all required fields are present in the payload
       await registerUser({
         firstName: data.firstName,
         lastName: data.lastName,
@@ -99,9 +98,24 @@ const SignUp = () => {
         router.push('/');
       }
     } catch (error) {
+      // Extract the error message from the API response
+      let errorMessage = 'An error occurred during registration. Please try again.';
+      
+      if (error instanceof Error) {
+        try {
+          const parsedError = JSON.parse(error.message);
+          if (parsedError.message) {
+            errorMessage = parsedError.message;
+          }
+        } catch (e) {
+          // If parsing fails, use the original error message
+          errorMessage = error.message;
+        }
+      }
+
       toast({
         title: 'Registration failed',
-        description: 'An error occurred during registration. Please try again.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

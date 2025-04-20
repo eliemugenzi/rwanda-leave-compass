@@ -6,24 +6,32 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllLeaveRequests } from "@/services/api";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(0);
+  const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
   const pageSize = 10;
   
-  const { data: allRequests, isLoading: isLoadingAll } = useQuery({
-    queryKey: ['leaveRequests', 'all', currentPage],
-    queryFn: () => fetchAllLeaveRequests(undefined, currentPage, pageSize),
-  });
-
-  const { data: pendingRequests, isLoading: isLoadingPending } = useQuery({
-    queryKey: ['leaveRequests', 'pending', currentPage],
-    queryFn: () => fetchAllLeaveRequests('PENDING', currentPage, pageSize),
+  const { data: requests, isLoading } = useQuery({
+    queryKey: ['leaveRequests', selectedStatus, currentPage],
+    queryFn: () => fetchAllLeaveRequests(selectedStatus, currentPage, pageSize),
   });
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+  };
+
+  const handleStatusChange = (status: string) => {
+    setSelectedStatus(status === "ALL" ? undefined : status);
+    setCurrentPage(0); // Reset to first page when changing status
   };
 
   return (
@@ -37,45 +45,39 @@ const AdminDashboard = () => {
         </p>
       </div>
 
-      <div className="grid gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Pending Leave Requests</CardTitle>
-            <CardDescription>Review and manage leave requests from employees</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoadingPending ? (
-              <div className="text-center py-4">Loading pending requests...</div>
-            ) : (
-              <LeaveRequestList 
-                requests={pendingRequests?.data.content || []}
-                currentPage={currentPage}
-                totalPages={pendingRequests?.data.totalPages || 0}
-                onPageChange={handlePageChange}
-              />
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>All Leave Requests</CardTitle>
-            <CardDescription>View all leave requests history</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoadingAll ? (
-              <div className="text-center py-4">Loading all requests...</div>
-            ) : (
-              <LeaveRequestList 
-                requests={allRequests?.data.content || []}
-                currentPage={currentPage}
-                totalPages={allRequests?.data.totalPages || 0}
-                onPageChange={handlePageChange}
-              />
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Leave Requests</CardTitle>
+              <CardDescription>View and manage all leave requests</CardDescription>
+            </div>
+            <Select value={selectedStatus || "ALL"} onValueChange={handleStatusChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Requests</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="APPROVED">Approved</SelectItem>
+                <SelectItem value="REJECTED">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="text-center py-4">Loading requests...</div>
+          ) : (
+            <LeaveRequestList 
+              requests={requests?.data.content || []}
+              currentPage={currentPage}
+              totalPages={requests?.data.totalPages || 0}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </CardContent>
+      </Card>
     </AppLayout>
   );
 };

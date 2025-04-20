@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { loginUser } from '@/services/api';
 
@@ -46,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         firstName: response.data.firstName,
         lastName: response.data.lastName,
         name: `${response.data.firstName} ${response.data.lastName}`,
-        role: response.data.role || 'employee' // Add role from response or default to 'employee'
+        role: response.data.role || 'ROLE_USER' // Updated default role to ROLE_USER
       };
       
       // Store the user in localStorage

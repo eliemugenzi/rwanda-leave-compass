@@ -48,8 +48,14 @@ export const useSignUpForm = () => {
   const onSubmit = async (data: SignUpFormData) => {
     setIsLoading(true);
     try {
+      // Make sure all required fields are present before passing to registerUser
       const response = await registerUser({
-        ...data,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        departmentId: data.departmentId,
+        jobTitleId: data.jobTitleId,
+        password: data.password,
         role: 'ROLE_USER',
       });
       

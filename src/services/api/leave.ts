@@ -1,92 +1,6 @@
-import { ApiResponse, Department, JobTitle } from '@/types/api';
+
 import { LeaveType } from '@/types/leave';
-
-const BASE_URL = 'https://time-away-backend-production.up.railway.app/api/v1';
-
-// Helper function to get the authentication token
-const getAuthToken = (): string | null => {
-  return localStorage.getItem('accessToken');
-};
-
-export interface RegisterPayload {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  departmentId: string;
-  jobTitleId: string;
-  role: string;
-}
-
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  message: string;
-  status: number;
-  data: {
-    accessToken: string;
-    refreshToken: string;
-    tokenType: string | null;
-    firstName: string;
-    lastName: string;
-    role?: string; // Added role as an optional property
-  };
-}
-
-export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
-  const response = await fetch(`${BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-  
-  const data = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(JSON.stringify(data));
-  }
-  
-  return data;
-}
-
-export async function registerUser(payload: RegisterPayload) {
-  const response = await fetch(`${BASE_URL}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-  
-  const data = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(JSON.stringify(data));
-  }
-  
-  return data;
-}
-
-export async function getDepartments(): Promise<ApiResponse<Department[]>> {
-  const response = await fetch(`${BASE_URL}/departments`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch departments');
-  }
-  return response.json();
-}
-
-export async function getJobTitles(departmentId: string): Promise<ApiResponse<JobTitle[]>> {
-  const response = await fetch(`${BASE_URL}/job-titles/department/${departmentId}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch job titles');
-  }
-  return response.json();
-}
+import { BASE_URL, getAuthToken } from './config';
 
 export interface PaginatedResponse<T> {
   content: T[];
@@ -125,6 +39,27 @@ export interface LeaveRequest {
   supervisorComment?: string;
   supervisorName?: string;
   reviewedAt?: string;
+}
+
+export interface CreateLeaveRequestPayload {
+  type: LeaveType;
+  startDate: string;
+  endDate: string;
+  reason: string;
+}
+
+export interface CreateLeaveRequestResponse {
+  message: string;
+  status: number;
+  data: LeaveRequest;
+}
+
+export interface LeaveBalanceResponse {
+  message: string;
+  status: number;
+  data: {
+    [key in LeaveType]: number;
+  };
 }
 
 export async function fetchAllLeaveRequests(status?: string, page: number = 0, size: number = 10): Promise<LeaveRequestResponse> {
@@ -169,14 +104,6 @@ export async function fetchUserLeaveRequests(status?: string, page: number = 0, 
   return response.json();
 }
 
-export interface LeaveBalanceResponse {
-  message: string;
-  status: number;
-  data: {
-    [key in LeaveType]: number;
-  };
-}
-
 export async function fetchLeaveBalances(): Promise<LeaveBalanceResponse> {
   const response = await fetch(`${BASE_URL}/leave-balances/me`, {
     headers: {
@@ -189,19 +116,6 @@ export async function fetchLeaveBalances(): Promise<LeaveBalanceResponse> {
   }
   
   return response.json();
-}
-
-export interface CreateLeaveRequestPayload {
-  type: LeaveType;
-  startDate: string;
-  endDate: string;
-  reason: string;
-}
-
-export interface CreateLeaveRequestResponse {
-  message: string;
-  status: number;
-  data: LeaveRequest;
 }
 
 export async function createLeaveRequest(payload: CreateLeaveRequestPayload): Promise<CreateLeaveRequestResponse> {

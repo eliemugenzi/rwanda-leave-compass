@@ -9,7 +9,6 @@ import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/pages-router/navigation";
 import { LeaveStatus } from "@/types/leave";
-// import { userProfile } from "@/data/temporaryMockData";
 import { useQuery } from "@tanstack/react-query";
 import { fetchUserLeaveRequests, fetchAllLeaveRequests } from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
@@ -57,7 +56,7 @@ const LeaveDetails = () => {
   ) : null;
 
   const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting(false);
 
   const isLoading = isLoadingUserRequests || isLoadingAllRequests;
 
@@ -171,20 +170,16 @@ const LeaveDetails = () => {
           <CardHeader className="pb-2">
             <div className="flex justify-between items-start">
               <div>
-                {isAdminOrHR && leaveRequest.employeeName && (
-                  <div className="mb-1">
-                    <span className="block text-sm text-muted-foreground">
-                      Requested by
-                    </span>
-                    <span className="font-semibold">
-                      {leaveRequest.employeeName}
-                    </span>
-                  </div>
-                )}
                 <CardTitle>{leaveRequest.type} Leave</CardTitle>
                 <CardDescription>
                   Requested on {formatDate(leaveRequest.createdAt)}
                 </CardDescription>
+                
+                {isAdminOrHR && leaveRequest.employeeName && (
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    Requested by <span className="font-semibold">{leaveRequest.employeeName}</span>
+                  </div>
+                )}
               </div>
               <Badge className={getStatusBadgeStyle(leaveRequest.status)}>
                 {leaveRequest.status}

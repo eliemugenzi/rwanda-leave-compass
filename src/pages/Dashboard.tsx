@@ -8,6 +8,7 @@ import { Plus, Calendar } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useRouter } from "@/pages-router/navigation";
 import { useAuth } from "@/context/AuthContext";
+import AdminDashboard from "./AdminDashboard";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -33,6 +34,12 @@ const Dashboard = () => {
     );
   }
 
+  // Show admin dashboard for HR and Admin users
+  if (user.role === "ROLE_HR" || user.role === "ROLE_ADMIN") {
+    return <AdminDashboard />;
+  }
+
+  // Regular user dashboard
   return (
     <AppLayout>
       <div className="flex items-center justify-between mb-6">

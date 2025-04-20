@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -103,6 +102,7 @@ export function LeaveRequestList({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Employee</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Start Date</TableHead>
               <TableHead>End Date</TableHead>
@@ -114,14 +114,15 @@ export function LeaveRequestList({
           <TableBody>
             {requests.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-6 text-muted-foreground">
                   No leave requests found
                 </TableCell>
               </TableRow>
             ) : (
               requests.map((request) => (
                 <TableRow key={request.id}>
-                  <TableCell className="font-medium">{request.type}</TableCell>
+                  <TableCell className="font-medium">{request.employeeName}</TableCell>
+                  <TableCell>{request.type}</TableCell>
                   <TableCell>{formatDate(request.startDate)}</TableCell>
                   <TableCell>{formatDate(request.endDate)}</TableCell>
                   <TableCell>

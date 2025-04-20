@@ -8,6 +8,7 @@ export interface AuthUser {
   lastName: string;
   name: string;
   email: string;
+  role: string; // Adding back the role property that was removed
 }
 
 // Define the auth context type
@@ -44,7 +45,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: email,
         firstName: response.data.firstName,
         lastName: response.data.lastName,
-        name: `${response.data.firstName} ${response.data.lastName}`
+        name: `${response.data.firstName} ${response.data.lastName}`,
+        role: response.data.role || 'employee' // Add role from response or default to 'employee'
       };
       
       // Store the user in localStorage
@@ -79,4 +81,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

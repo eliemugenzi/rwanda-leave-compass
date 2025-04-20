@@ -1,3 +1,4 @@
+
 import { ApiResponse, Department, JobTitle } from '@/types/api';
 
 const BASE_URL = 'https://time-away-backend-production.up.railway.app/api/v1';
@@ -26,6 +27,7 @@ export interface AuthResponse {
     tokenType: string | null;
     firstName: string;
     lastName: string;
+    role?: string; // Added role as an optional property
   };
 }
 

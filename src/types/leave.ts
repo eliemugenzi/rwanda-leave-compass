@@ -31,6 +31,16 @@ export interface LeaveRequest {
   supervisorName?: string;
   supervisorComment?: string;
   reviewedAt?: string;
+  // Added from the API response
+  employeeName?: string;
+  rejectionReason?: string | null;
+  approver?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  } | null;
+  updatedAt?: string;
 }
 
 export interface User {

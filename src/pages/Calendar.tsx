@@ -46,8 +46,24 @@ const Calendar = () => {
     return allLeaveDates.find((leaveDate) => leaveDate.date === dateStr);
   };
 
-  // Function to generate className for calendar day based on leave status
-  const dayClassName = (date: Date) => {
+  const getMonthLeaves = () => {
+    const currentMonthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+    const currentMonthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    
+    return (leaveRequests?.data.content || []).filter((request) => {
+      const startDate = parseISO(request.startDate);
+      const endDate = parseISO(request.endDate);
+      
+      return isWithinInterval(startDate, { start: currentMonthStart, end: currentMonthEnd }) ||
+             isWithinInterval(endDate, { start: currentMonthStart, end: currentMonthEnd }) ||
+             (isBefore(startDate, currentMonthStart) && isBefore(currentMonthEnd, endDate));
+    });
+  };
+
+  const monthLeaves = getMonthLeaves();
+
+  // Classname generator for leave types - fixed to return string
+  const getLeaveDayClassName = (date: Date): string => {
     const leaveInfo = getLeaveInfo(date);
     if (!leaveInfo) return "";
     
@@ -64,22 +80,6 @@ const Calendar = () => {
         return "";
     }
   };
-
-  const getMonthLeaves = () => {
-    const currentMonthStart = new Date(date.getFullYear(), date.getMonth(), 1);
-    const currentMonthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    
-    return (leaveRequests?.data.content || []).filter((request) => {
-      const startDate = parseISO(request.startDate);
-      const endDate = parseISO(request.endDate);
-      
-      return isWithinInterval(startDate, { start: currentMonthStart, end: currentMonthEnd }) ||
-             isWithinInterval(endDate, { start: currentMonthStart, end: currentMonthEnd }) ||
-             (isBefore(startDate, currentMonthStart) && isBefore(currentMonthEnd, endDate));
-    });
-  };
-
-  const monthLeaves = getMonthLeaves();
 
   if (isLoading) {
     return (
@@ -115,26 +115,13 @@ const Calendar = () => {
                 className="rounded-md border w-full"
                 modifiersClassNames={{
                   selected: "bg-primary text-primary-foreground",
-                  booked: (date) => {
-                    const leaveInfo = getLeaveInfo(date);
-                    if (!leaveInfo) return "";
-                    
-                    switch (leaveInfo.type) {
-                      case LeaveType.ANNUAL:
-                        return "bg-primary/20 text-primary-foreground";
-                      case LeaveType.SICK:
-                        return "bg-amber-500/20 text-amber-900";
-                      case LeaveType.MATERNITY:
-                        return "bg-pink-500/20 text-pink-900";
-                      case LeaveType.PATERNITY:
-                        return "bg-emerald-500/20 text-emerald-900";
-                      default:
-                        return "";
-                    }
-                  }
+                  // Changed this to be a string, using our helper function in the modifiers section
                 }}
                 modifiers={{
                   booked: (date) => !!getLeaveInfo(date),
+                }}
+                styles={{
+                  day_booked: (date) => getLeaveDayClassName(date),
                 }}
               />
             </CardContent>

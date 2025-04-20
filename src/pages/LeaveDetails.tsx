@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -11,32 +12,53 @@ import { useRouter } from "@/pages-router/navigation";
 import { LeaveStatus } from "@/types/leave";
 import { userProfile } from "@/data/temporaryMockData";
 import { useQuery } from "@tanstack/react-query";
-import { fetchUserLeaveRequests } from "@/services/api";
+import { fetchUserLeaveRequests, fetchAllLeaveRequests } from "@/services/api";
 
 const LeaveDetails = () => {
-  // Extract ID from URL path
   const router = useRouter();
   
-  // Extract ID from URL path
-  const [id, setId] = useState<string | null>(null);
+  // Extract ID from URL path more reliably
+  const extractIdFromPath = () => {
+    const pathParts = window.location.pathname.split('/');
+    return pathParts[pathParts.length - 1];
+  };
   
+  const [id, setId] = useState<string>(extractIdFromPath());
+  
+  // Listen for route changes
   useEffect(() => {
-    // Extract ID from the current pathname
-    const pathSegments = router.pathname.split('/');
-    const leaveId = pathSegments[pathSegments.length - 1];
-    setId(leaveId);
-  }, [router.pathname]);
+    const updateId = () => {
+      setId(extractIdFromPath());
+    };
+    
+    // Update ID when route changes
+    window.addEventListener('customNavigation', updateId);
+    return () => {
+      window.removeEventListener('customNavigation', updateId);
+    };
+  }, []);
   
-  // Fetch leave requests and find the one we want
-  const { data: leaveRequestsResponse, isLoading } = useQuery({
-    queryKey: ['leaveRequests', 'details'],
+  // Fetch both user's leave requests and all leave requests
+  const { data: userLeaveRequestsResponse, isLoading: isLoadingUserRequests } = useQuery({
+    queryKey: ['leaveRequests', 'me'],
     queryFn: () => fetchUserLeaveRequests(),
   });
   
-  const leaveRequest = id ? leaveRequestsResponse?.data.content.find(request => request.id === id) : null;
+  const { data: allLeaveRequestsResponse, isLoading: isLoadingAllRequests } = useQuery({
+    queryKey: ['leaveRequests', 'all'],
+    queryFn: () => fetchAllLeaveRequests(),
+  });
+  
+  // Find the request in either user's requests or all requests
+  const leaveRequest = id ? (
+    (userLeaveRequestsResponse?.data.content || []).find(req => req.id === id) || 
+    (allLeaveRequestsResponse?.data.content || []).find(req => req.id === id)
+  ) : null;
   
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const isLoading = isLoadingUserRequests || isLoadingAllRequests;
   
   if (isLoading) {
     return (
@@ -53,7 +75,7 @@ const LeaveDetails = () => {
       <AppLayout>
         <div className="flex flex-col items-center justify-center py-16">
           <h1 className="text-2xl font-bold mb-4">Leave Request Not Found</h1>
-          <p className="text-muted-foreground mb-6">The requested leave details could not be found.</p>
+          <p className="text-muted-foreground mb-6">The requested leave details could not be found (ID: {id}).</p>
           <Button onClick={() => router.push("/my-leaves")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Return to My Leaves

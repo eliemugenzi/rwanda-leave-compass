@@ -5,12 +5,13 @@ import { LeaveRequestForm, LeaveRequestFormValues } from "@/components/leave/Lea
 import { LeavePolicy } from "@/components/leave/LeavePolicy";
 import { createLeaveRequest } from "@/services/api";
 import { format } from "date-fns";
+import { LeaveType } from "@/types/leave";
 
 const LeaveRequest = () => {
   async function onSubmit(values: LeaveRequestFormValues) {
     try {
       const payload = {
-        type: values.leaveType,
+        type: values.leaveType as LeaveType,
         startDate: format(values.startDate, 'yyyy-MM-dd'),
         endDate: format(values.endDate, 'yyyy-MM-dd'),
         reason: values.reason

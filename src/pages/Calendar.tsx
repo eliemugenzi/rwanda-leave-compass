@@ -5,6 +5,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockLeaveRequests } from "@/data/mockData";
 import { addDays, format, isBefore, isWithinInterval, parseISO } from "date-fns";
+import { LeaveType, LeaveStatus } from "@/types/leave";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
@@ -46,14 +47,14 @@ const Calendar = () => {
     if (!leaveInfo) return "";
     
     switch (leaveInfo.type) {
-      case "PTO":
+      case "ANNUAL":
         return "bg-primary/20 text-primary-foreground hover:bg-primary/30";
-      case "Sick":
+      case "SICK":
         return "bg-amber-500/20 text-amber-900 hover:bg-amber-500/30";
-      case "Compassionate":
-        return "bg-emerald-500/20 text-emerald-900 hover:bg-emerald-500/30";
-      case "Maternity":
+      case "MATERNITY":
         return "bg-pink-500/20 text-pink-900 hover:bg-pink-500/30";
+      case "PATERNITY":
+        return "bg-emerald-500/20 text-emerald-900 hover:bg-emerald-500/30";
       default:
         return "";
     }
@@ -119,19 +120,19 @@ const Calendar = () => {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded-full bg-primary/20"></div>
-                  <span>Personal Time Off (PTO)</span>
+                  <span>Annual Leave/PTO</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded-full bg-amber-500/20"></div>
                   <span>Sick Leave</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-emerald-500/20"></div>
-                  <span>Compassionate Leave</span>
-                </div>
-                <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded-full bg-pink-500/20"></div>
                   <span>Maternity Leave</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full bg-emerald-500/20"></div>
+                  <span>Paternity Leave</span>
                 </div>
               </div>
             </CardContent>
@@ -149,11 +150,15 @@ const Calendar = () => {
                     <div key={leave.id} className="border-l-4 pl-3 py-2" 
                       style={{ 
                         borderColor: 
-                          leave.type === 'PTO' ? 'hsl(262, 83%, 58%)' : 
-                          leave.type === 'Sick' ? '#f59e0b' :
-                          leave.type === 'Compassionate' ? '#10b981' : '#ec4899'
+                          leave.type === 'ANNUAL' ? 'hsl(262, 83%, 58%)' : 
+                          leave.type === 'SICK' ? '#f59e0b' :
+                          leave.type === 'MATERNITY' ? '#ec4899' : '#10b981'
                       }}>
-                      <div className="font-medium">{leave.type}</div>
+                      <div className="font-medium">
+                        {leave.type === 'ANNUAL' ? 'Annual Leave/PTO' :
+                         leave.type === 'SICK' ? 'Sick Leave' :
+                         leave.type === 'MATERNITY' ? 'Maternity Leave' : 'Paternity Leave'}
+                      </div>
                       <div className="text-sm text-muted-foreground">
                         {format(parseISO(leave.startDate), 'MMM dd')} - {format(parseISO(leave.endDate), 'MMM dd, yyyy')}
                       </div>

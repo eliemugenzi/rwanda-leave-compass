@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { LeaveBalance } from "@/types/leave";
+import { LeaveBalance, LeaveType } from "@/types/leave";
 import { cn } from "@/lib/utils";
 
 interface LeaveBalanceCardProps {
@@ -12,16 +12,16 @@ export function LeaveBalanceCard({ leaveBalance }: LeaveBalanceCardProps) {
   const { type, available, used, total } = leaveBalance;
   const percentUsed = Math.round((used / total) * 100);
 
-  const getColorByType = (type: string): string => {
+  const getColorByType = (type: LeaveType): string => {
     switch (type) {
-      case "PTO":
+      case LeaveType.ANNUAL:
         return "bg-primary";
-      case "Sick":
+      case LeaveType.SICK:
         return "bg-amber-500";
-      case "Compassionate":
-        return "bg-emerald-500";
-      case "Maternity":
+      case LeaveType.MATERNITY:
         return "bg-pink-500";
+      case LeaveType.PATERNITY:
+        return "bg-emerald-500";
       default:
         return "bg-gray-500";
     }
@@ -31,7 +31,11 @@ export function LeaveBalanceCard({ leaveBalance }: LeaveBalanceCardProps) {
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex justify-between">
-          <span>{type}</span>
+          <span>
+            {type === LeaveType.ANNUAL ? "Annual Leave/PTO" : 
+             type === LeaveType.SICK ? "Sick Leave" :
+             type === LeaveType.MATERNITY ? "Maternity Leave" : "Paternity Leave"}
+          </span>
           <span className="text-sm">
             {available} / {total} days
           </span>

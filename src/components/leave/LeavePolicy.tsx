@@ -1,25 +1,32 @@
 
+import { LeaveType } from "@/types/leave";
+
 interface LeavePolicyItem {
   title: string;
   description: string;
+  type: LeaveType;
 }
 
 const policyItems: LeavePolicyItem[] = [
   {
     title: "Annual Leave/PTO",
-    description: "Employees are entitled to 20 days of annual leave per year."
+    description: "Employees are entitled to 20 days of annual leave per year.",
+    type: LeaveType.ANNUAL
   },
   {
     title: "Sick Leave",
-    description: "Up to 12 days of paid sick leave per year with medical certificate required for leaves exceeding 3 consecutive days."
+    description: "Up to 12 days of paid sick leave per year with medical certificate required for leaves exceeding 3 consecutive days.",
+    type: LeaveType.SICK
   },
   {
     title: "Maternity Leave",
-    description: "Female employees are entitled to 12 weeks (84 days) of paid maternity leave."
+    description: "Female employees are entitled to 12 weeks (84 days) of paid maternity leave.",
+    type: LeaveType.MATERNITY
   },
   {
     title: "Paternity Leave",
-    description: "Male employees are entitled to 2 weeks (14 days) of paid paternity leave."
+    description: "Male employees are entitled to 2 weeks (14 days) of paid paternity leave.",
+    type: LeaveType.PATERNITY
   }
 ];
 

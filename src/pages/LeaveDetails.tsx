@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { mockLeaveRequests, userProfile } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/pages-router/navigation";
+import { LeaveStatus } from "@/types/leave";
 
 const LeaveDetails = () => {
   const router = useRouter();
@@ -57,9 +58,9 @@ const LeaveDetails = () => {
   
   const getStatusBadgeStyle = (status: string) => {
     switch (status) {
-      case "Approved":
+      case "APPROVED":
         return "bg-emerald-500 hover:bg-emerald-600";
-      case "Rejected":
+      case "REJECTED":
         return "bg-red-500 hover:bg-red-600";
       default:
         return "bg-amber-500 hover:bg-amber-600";
@@ -100,7 +101,7 @@ const LeaveDetails = () => {
   };
   
   const isSupervisor = userProfile.role === "supervisor" || userProfile.role === "admin";
-  const isPending = leaveRequest.status === "Pending";
+  const isPending = leaveRequest.status === LeaveStatus.PENDING;
 
   return (
     <AppLayout>

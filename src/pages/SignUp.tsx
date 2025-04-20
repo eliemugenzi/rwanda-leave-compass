@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useRouter } from '@/pages-router/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -79,8 +78,14 @@ const SignUp = () => {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
+      // Fix: Ensure all required fields are present in the payload
       await registerUser({
-        ...data,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        departmentId: data.departmentId,
+        jobTitleId: data.jobTitleId,
         role: 'ROLE_USER',
       });
       

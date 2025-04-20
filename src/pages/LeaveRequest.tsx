@@ -3,24 +3,33 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { toast } from "@/hooks/use-toast";
 import { LeaveRequestForm, LeaveRequestFormValues } from "@/components/leave/LeaveRequestForm";
 import { LeavePolicy } from "@/components/leave/LeavePolicy";
-import { userProfile } from "@/data/temporaryMockData";
+import { createLeaveRequest } from "@/services/api";
+import { format } from "date-fns";
 
 const LeaveRequest = () => {
-  function onSubmit(values: LeaveRequestFormValues) {
-    // In a real app, you would send this data to your backend
-    const newLeaveRequest = {
-      ...values,
-      supervisorName: userProfile.supervisorName,
-      supervisorId: userProfile.supervisorId,
-    };
-    
-    console.log("Submitting leave request:", newLeaveRequest);
-    
-    // Show success toast
-    toast({
-      title: "Leave request submitted",
-      description: "Your request has been sent to your supervisor for approval.",
-    });
+  async function onSubmit(values: LeaveRequestFormValues) {
+    try {
+      const payload = {
+        type: values.leaveType,
+        startDate: format(values.startDate, 'yyyy-MM-dd'),
+        endDate: format(values.endDate, 'yyyy-MM-dd'),
+        reason: values.reason
+      };
+
+      await createLeaveRequest(payload);
+      
+      toast({
+        title: "Leave request submitted",
+        description: "Your request has been sent to your supervisor for approval.",
+      });
+    } catch (error) {
+      console.error("Error submitting leave request:", error);
+      toast({
+        title: "Error submitting request",
+        description: "There was an error submitting your leave request. Please try again.",
+        variant: "destructive"
+      });
+    }
   }
 
   return (

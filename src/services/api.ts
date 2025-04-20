@@ -1,5 +1,5 @@
-
 import { ApiResponse, Department, JobTitle } from '@/types/api';
+import { LeaveType } from '@/types/leave';
 
 const BASE_URL = 'https://time-away-backend-production.up.railway.app/api/v1';
 
@@ -169,8 +169,6 @@ export async function fetchUserLeaveRequests(status?: string, page: number = 0, 
   return response.json();
 }
 
-import { LeaveType } from '@/types/leave';
-
 export interface LeaveBalanceResponse {
   message: string;
   status: number;
@@ -190,5 +188,35 @@ export async function fetchLeaveBalances(): Promise<LeaveBalanceResponse> {
     throw new Error('Failed to fetch leave balances');
   }
   
+  return response.json();
+}
+
+export interface CreateLeaveRequestPayload {
+  type: LeaveType;
+  startDate: string;
+  endDate: string;
+  reason: string;
+}
+
+export interface CreateLeaveRequestResponse {
+  message: string;
+  status: number;
+  data: LeaveRequest;
+}
+
+export async function createLeaveRequest(payload: CreateLeaveRequestPayload): Promise<CreateLeaveRequestResponse> {
+  const response = await fetch(`${BASE_URL}/leave-requests`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${getAuthToken()}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create leave request');
+  }
+
   return response.json();
 }

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -10,56 +9,58 @@ import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/pages-router/navigation";
 import { LeaveStatus } from "@/types/leave";
-import { userProfile } from "@/data/temporaryMockData";
+// import { userProfile } from "@/data/temporaryMockData";
 import { useQuery } from "@tanstack/react-query";
 import { fetchUserLeaveRequests, fetchAllLeaveRequests } from "@/services/api";
+import { useAuth } from "@/context/AuthContext";
 
 const LeaveDetails = () => {
   const router = useRouter();
-  
+  const { user } = useAuth();
+
   // Extract ID from URL path more reliably
   const extractIdFromPath = () => {
     const pathParts = window.location.pathname.split('/');
     return pathParts[pathParts.length - 1];
   };
-  
+
   const [id, setId] = useState<string>(extractIdFromPath());
-  
+
   // Listen for route changes
   useEffect(() => {
     const updateId = () => {
       setId(extractIdFromPath());
     };
-    
+
     // Update ID when route changes
     window.addEventListener('customNavigation', updateId);
     return () => {
       window.removeEventListener('customNavigation', updateId);
     };
   }, []);
-  
+
   // Fetch both user's leave requests and all leave requests
   const { data: userLeaveRequestsResponse, isLoading: isLoadingUserRequests } = useQuery({
     queryKey: ['leaveRequests', 'me'],
     queryFn: () => fetchUserLeaveRequests(),
   });
-  
+
   const { data: allLeaveRequestsResponse, isLoading: isLoadingAllRequests } = useQuery({
     queryKey: ['leaveRequests', 'all'],
     queryFn: () => fetchAllLeaveRequests(),
   });
-  
+
   // Find the request in either user's requests or all requests
   const leaveRequest = id ? (
-    (userLeaveRequestsResponse?.data.content || []).find(req => req.id === id) || 
+    (userLeaveRequestsResponse?.data.content || []).find(req => req.id === id) ||
     (allLeaveRequestsResponse?.data.content || []).find(req => req.id === id)
   ) : null;
-  
+
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const isLoading = isLoadingUserRequests || isLoadingAllRequests;
-  
+
   if (isLoading) {
     return (
       <AppLayout>
@@ -69,7 +70,7 @@ const LeaveDetails = () => {
       </AppLayout>
     );
   }
-  
+
   if (!leaveRequest) {
     return (
       <AppLayout>
@@ -84,18 +85,18 @@ const LeaveDetails = () => {
       </AppLayout>
     );
   }
-  
+
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), "MMMM dd, yyyy");
   };
-  
+
   const calculateDuration = (startDate: string, endDate: string) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const diffTime = Math.abs(end.getTime() - start.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
   };
-  
+
   const getStatusBadgeStyle = (status: string) => {
     switch (status) {
       case LeaveStatus.APPROVED:
@@ -106,7 +107,7 @@ const LeaveDetails = () => {
         return "bg-amber-500 hover:bg-amber-600";
     }
   };
-  
+
   const handleApprove = () => {
     setIsSubmitting(true);
     setTimeout(() => {
@@ -118,7 +119,7 @@ const LeaveDetails = () => {
       router.push("/supervisor-dashboard");
     }, 1000);
   };
-  
+
   const handleReject = () => {
     if (!comment.trim()) {
       toast({
@@ -128,7 +129,7 @@ const LeaveDetails = () => {
       });
       return;
     }
-    
+
     setIsSubmitting(true);
     setTimeout(() => {
       toast({
@@ -139,8 +140,15 @@ const LeaveDetails = () => {
       router.push("/supervisor-dashboard");
     }, 1000);
   };
-  
-  const isSupervisor = userProfile.role === "supervisor" || userProfile.role === "admin";
+
+  // Assume admin and HR (case-insensitive, and support both roles if HR exists)
+  const isAdminOrHR = user && (
+    (user.role && user.role.toLowerCase().includes("admin")) ||
+    (user.role && user.role.toLowerCase().includes("hr"))
+  );
+
+  // Supervisor check (previous behavior)
+  const isSupervisor = user && (user.role === "supervisor" || user.role === "admin");
   const isPending = leaveRequest.status === LeaveStatus.PENDING;
 
   return (
@@ -157,12 +165,22 @@ const LeaveDetails = () => {
           </p>
         </div>
       </div>
-      
+
       <div className="grid gap-6">
         <Card>
           <CardHeader className="pb-2">
             <div className="flex justify-between items-start">
               <div>
+                {isAdminOrHR && leaveRequest.employeeName && (
+                  <div className="mb-1">
+                    <span className="block text-sm text-muted-foreground">
+                      Requested by
+                    </span>
+                    <span className="font-semibold">
+                      {leaveRequest.employeeName}
+                    </span>
+                  </div>
+                )}
                 <CardTitle>{leaveRequest.type} Leave</CardTitle>
                 <CardDescription>
                   Requested on {formatDate(leaveRequest.createdAt)}
@@ -173,7 +191,7 @@ const LeaveDetails = () => {
               </Badge>
             </div>
           </CardHeader>
-          
+
           <CardContent className="pt-4 pb-6">
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-4">
@@ -223,7 +241,7 @@ const LeaveDetails = () => {
               </div>
             </div>
           </CardContent>
-          
+
           {isSupervisor && isPending && (
             <CardFooter className="flex-col items-stretch border-t pt-6">
               <h3 className="font-semibold mb-2">Review Leave Request</h3>

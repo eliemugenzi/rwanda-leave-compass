@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeaveRequestList } from "@/components/leave/LeaveRequestList";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -8,16 +9,22 @@ import { fetchAllLeaveRequests } from "@/services/api";
 
 const AdminDashboard = () => {
   const { user } = useAuth();
+  const [currentPage, setCurrentPage] = useState(0);
+  const pageSize = 10;
   
   const { data: allRequests, isLoading: isLoadingAll } = useQuery({
-    queryKey: ['leaveRequests', 'all'],
-    queryFn: () => fetchAllLeaveRequests(),
+    queryKey: ['leaveRequests', 'all', currentPage],
+    queryFn: () => fetchAllLeaveRequests(undefined, currentPage, pageSize),
   });
 
   const { data: pendingRequests, isLoading: isLoadingPending } = useQuery({
-    queryKey: ['leaveRequests', 'pending'],
-    queryFn: () => fetchAllLeaveRequests('PENDING'),
+    queryKey: ['leaveRequests', 'pending', currentPage],
+    queryFn: () => fetchAllLeaveRequests('PENDING', currentPage, pageSize),
   });
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   return (
     <AppLayout>
@@ -40,7 +47,12 @@ const AdminDashboard = () => {
             {isLoadingPending ? (
               <div className="text-center py-4">Loading pending requests...</div>
             ) : (
-              <LeaveRequestList requests={pendingRequests?.data || []} />
+              <LeaveRequestList 
+                requests={pendingRequests?.data.content || []}
+                currentPage={currentPage}
+                totalPages={pendingRequests?.data.totalPages || 0}
+                onPageChange={handlePageChange}
+              />
             )}
           </CardContent>
         </Card>
@@ -54,7 +66,12 @@ const AdminDashboard = () => {
             {isLoadingAll ? (
               <div className="text-center py-4">Loading all requests...</div>
             ) : (
-              <LeaveRequestList requests={allRequests?.data || []} />
+              <LeaveRequestList 
+                requests={allRequests?.data.content || []}
+                currentPage={currentPage}
+                totalPages={allRequests?.data.totalPages || 0}
+                onPageChange={handlePageChange}
+              />
             )}
           </CardContent>
         </Card>

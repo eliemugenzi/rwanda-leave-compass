@@ -82,11 +82,19 @@ export async function getJobTitles(departmentId: string): Promise<ApiResponse<Jo
   return response.json();
 }
 
+export interface PaginatedResponse<T> {
+  content: T[];
+  pageNo: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+}
+
 export interface LeaveRequestResponse {
-  success: boolean;
   message: string;
   status: number;
-  data: LeaveRequest[];
+  data: PaginatedResponse<LeaveRequest>;
 }
 
 export interface Approver {
@@ -110,11 +118,13 @@ export interface LeaveRequest {
   updatedAt: string;
 }
 
-export async function fetchAllLeaveRequests(status?: string): Promise<LeaveRequestResponse> {
+export async function fetchAllLeaveRequests(status?: string, page: number = 0, size: number = 10): Promise<LeaveRequestResponse> {
   const url = new URL(`${BASE_URL}/leave-requests`);
   if (status) {
     url.searchParams.append('status', status);
   }
+  url.searchParams.append('page', page.toString());
+  url.searchParams.append('size', size.toString());
   
   const response = await fetch(url.toString(), {
     headers: {
@@ -129,11 +139,13 @@ export async function fetchAllLeaveRequests(status?: string): Promise<LeaveReque
   return response.json();
 }
 
-export async function fetchUserLeaveRequests(status?: string): Promise<LeaveRequestResponse> {
+export async function fetchUserLeaveRequests(status?: string, page: number = 0, size: number = 10): Promise<LeaveRequestResponse> {
   const url = new URL(`${BASE_URL}/leave-requests/me`);
   if (status) {
     url.searchParams.append('status', status);
   }
+  url.searchParams.append('page', page.toString());
+  url.searchParams.append('size', size.toString());
   
   const response = await fetch(url.toString(), {
     headers: {

@@ -11,13 +11,29 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import { useRouter } from "@/pages-router/navigation";
-import { LeaveRequest as ApiLeaveRequest } from "@/services/api";
+import { LeaveRequest } from "@/services/api";
+import { 
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface LeaveRequestListProps {
-  requests: ApiLeaveRequest[];
+  requests: LeaveRequest[];
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
-export function LeaveRequestList({ requests }: LeaveRequestListProps) {
+export function LeaveRequestList({ 
+  requests,
+  currentPage,
+  totalPages,
+  onPageChange,
+}: LeaveRequestListProps) {
   const router = useRouter();
 
   const getStatusBadgeStyle = (status: string) => {
@@ -56,51 +72,100 @@ export function LeaveRequestList({ requests }: LeaveRequestListProps) {
     router.push(`/leave-details/${id}`);
   };
 
+  const renderPaginationItems = () => {
+    const items = [];
+    const maxDisplayedPages = 5;
+    let startPage = Math.max(0, currentPage - Math.floor(maxDisplayedPages / 2));
+    let endPage = Math.min(totalPages - 1, startPage + maxDisplayedPages - 1);
+
+    if (endPage - startPage + 1 < maxDisplayedPages) {
+      startPage = Math.max(0, endPage - maxDisplayedPages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => onPageChange(i)}
+            isActive={currentPage === i}
+          >
+            {i + 1}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    return items;
+  };
+
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Type</TableHead>
-            <TableHead>Start Date</TableHead>
-            <TableHead>End Date</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {requests.length === 0 ? (
+    <div className="space-y-4">
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                No leave requests found
-              </TableCell>
+              <TableHead>Type</TableHead>
+              <TableHead>Start Date</TableHead>
+              <TableHead>End Date</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Action</TableHead>
             </TableRow>
-          ) : (
-            requests.map((request) => (
-              <TableRow key={request.id}>
-                <TableCell className="font-medium">{request.type}</TableCell>
-                <TableCell>{formatDate(request.startDate)}</TableCell>
-                <TableCell>{formatDate(request.endDate)}</TableCell>
-                <TableCell>
-                  {calculateDuration(request.startDate, request.endDate)} days
-                </TableCell>
-                <TableCell>
-                  <Badge className={getStatusBadgeStyle(request.status)}>
-                    {request.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button size="sm" variant="ghost" onClick={() => viewLeaveDetails(request.id)}>
-                    <Eye className="h-4 w-4 mr-1" />
-                    View
-                  </Button>
+          </TableHeader>
+          <TableBody>
+            {requests.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                  No leave requests found
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ) : (
+              requests.map((request) => (
+                <TableRow key={request.id}>
+                  <TableCell className="font-medium">{request.type}</TableCell>
+                  <TableCell>{formatDate(request.startDate)}</TableCell>
+                  <TableCell>{formatDate(request.endDate)}</TableCell>
+                  <TableCell>
+                    {calculateDuration(request.startDate, request.endDate)} days
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusBadgeStyle(request.status)}>
+                      {request.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button size="sm" variant="ghost" onClick={() => viewLeaveDetails(request.id)}>
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      
+      {totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                onClick={() => onPageChange(currentPage - 1)}
+                className={currentPage === 0 ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationItem>
+            
+            {renderPaginationItems()}
+            
+            <PaginationItem>
+              <PaginationNext 
+                onClick={() => onPageChange(currentPage + 1)}
+                className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }

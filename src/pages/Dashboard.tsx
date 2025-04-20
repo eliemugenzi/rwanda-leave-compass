@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeaveBalanceCard } from "@/components/dashboard/LeaveBalanceCard";
@@ -10,7 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import AdminDashboard from "./AdminDashboard";
 import { useQuery } from "@tanstack/react-query";
 import { LeaveType } from "@/types/leave";
-import { fetchUserLeaveRequests } from "@/services/api";
+import { fetchUserLeaveRequests, fetchLeaveBalances } from "@/services/api";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -21,6 +22,12 @@ const Dashboard = () => {
   const { data: userLeaveRequests, isLoading: isLoadingRequests } = useQuery({
     queryKey: ['leaveRequests', 'user', currentPage],
     queryFn: () => fetchUserLeaveRequests(undefined, currentPage, pageSize),
+    enabled: !!user && user.role === 'ROLE_USER',
+  });
+
+  const { data: leaveBalancesData, isLoading: isLoadingBalances } = useQuery({
+    queryKey: ['leaveBalances'],
+    queryFn: fetchLeaveBalances,
     enabled: !!user && user.role === 'ROLE_USER',
   });
 
@@ -48,40 +55,37 @@ const Dashboard = () => {
     );
   }
 
-  // Show admin dashboard for HR and Admin users
   if (user.role === "ROLE_HR" || user.role === "ROLE_ADMIN") {
     return <AdminDashboard />;
   }
 
-  // Temporary mock leave balances until we have an API endpoint
-  const leaveBalances = [
+  const leaveBalances = leaveBalancesData ? [
     {
       type: LeaveType.ANNUAL,
-      available: 15,
-      used: 5,
-      total: 20
+      total: 20,
+      available: leaveBalancesData.data.ANNUAL,
+      used: 20 - leaveBalancesData.data.ANNUAL
     },
     {
       type: LeaveType.SICK,
-      available: 10,
-      used: 2,
-      total: 12
+      total: 12,
+      available: leaveBalancesData.data.SICK,
+      used: 12 - leaveBalancesData.data.SICK
     },
     {
       type: LeaveType.MATERNITY,
-      available: 84,
-      used: 0,
-      total: 84
+      total: 90,
+      available: leaveBalancesData.data.MATERNITY,
+      used: 90 - leaveBalancesData.data.MATERNITY
     },
     {
       type: LeaveType.PATERNITY,
-      available: 14,
-      used: 0,
-      total: 14
+      total: 14,
+      available: leaveBalancesData.data.PATERNITY,
+      used: 14 - leaveBalancesData.data.PATERNITY
     }
-  ];
+  ] : [];
 
-  // Regular user dashboard
   return (
     <AppLayout>
       <div className="flex items-center justify-between mb-6">
@@ -117,11 +121,20 @@ const Dashboard = () => {
             <CardDescription>Your current leave allowances and usage</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {leaveBalances.map((balance) => (
-                <LeaveBalanceCard key={balance.type} leaveBalance={balance} />
-              ))}
-            </div>
+            {isLoadingBalances ? (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="h-24 rounded-md bg-muted animate-pulse" />
+                <div className="h-24 rounded-md bg-muted animate-pulse" />
+                <div className="h-24 rounded-md bg-muted animate-pulse" />
+                <div className="h-24 rounded-md bg-muted animate-pulse" />
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {leaveBalances.map((balance) => (
+                  <LeaveBalanceCard key={balance.type} leaveBalance={balance} />
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

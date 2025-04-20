@@ -1,89 +1,12 @@
-import { useState } from 'react';
-import { useRouter } from '@/pages-router/navigation';
-import { useAuth } from '@/context/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+
+import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 import { Link } from '@/pages-router/navigation';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { useToast } from '@/hooks/use-toast';
 import { Logo } from '@/components/layout/Logo';
-import { loginUser, AuthResponse } from '@/services/api';
-
-// Form validation schema
-const formSchema = z.object({
-  email: z.string().email({ message: 'Please enter a valid email address.' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
-});
-
-type FormData = z.infer<typeof formSchema>;
+import { LoginFormFields } from '@/components/auth/LoginFormFields';
+import { useLoginForm } from '@/hooks/useLoginForm';
 
 const Login = () => {
-  const { login } = useAuth();
-  const router = useRouter();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Initialize react-hook-form
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
-
-  // Form submission handler
-  const onSubmit = async (data: FormData) => {
-    setIsLoading(true);
-    try {
-      const response: AuthResponse = await loginUser({
-        email: data.email,
-        password: data.password,
-      });
-
-      // Save the access token to localStorage
-      if (response.data.accessToken) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-      }
-
-      const success = await login(data.email, data.password);
-      
-      if (success) {
-        toast({
-          title: 'Login successful',
-          description: 'Welcome back!',
-        });
-        router.push('/');
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      let errorMessage = 'Invalid email or password. Please try again.';
-      
-      if (error instanceof Error) {
-        try {
-          const parsedError = JSON.parse(error.message);
-          if (parsedError && parsedError.message) {
-            errorMessage = parsedError.message;
-          }
-        } catch (e) {
-          // If parsing fails, use the original error message
-          errorMessage = error.message;
-        }
-      }
-
-      toast({
-        title: 'Login failed',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { form, isLoading, onSubmit } = useLoginForm();
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/30">
@@ -93,42 +16,11 @@ const Login = () => {
           <CardDescription>Sign in to access your leave management dashboard</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="your.email@example.com" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Enter your work email address
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : 'Sign in'}
-              </Button>
-            </form>
-          </Form>
+          <LoginFormFields
+            form={form}
+            isLoading={isLoading}
+            onSubmit={onSubmit}
+          />
         </CardContent>
         <CardFooter className="flex flex-col space-y-2 text-center text-sm text-muted-foreground">
           <p>Don't have an account?</p>

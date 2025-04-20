@@ -1,9 +1,10 @@
-
 export enum LeaveType {
   ANNUAL = 'ANNUAL',
   SICK = 'SICK',
   MATERNITY = 'MATERNITY',
-  PATERNITY = 'PATERNITY'
+  PATERNITY = 'PATERNITY',
+  UNPAID = 'UNPAID',
+  BEREAVEMENT = 'BEREAVEMENT'
 }
 
 export enum LeaveStatus {
@@ -53,3 +54,4 @@ export interface User {
   supervisorId?: string;
   supervisorName?: string;
 }
+

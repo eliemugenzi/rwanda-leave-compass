@@ -59,32 +59,17 @@ const Dashboard = () => {
     return <AdminDashboard />;
   }
 
-  const leaveBalances = leaveBalancesData ? [
-    {
-      type: LeaveType.ANNUAL,
-      total: leaveBalancesData.data.ANNUAL.totalDays,
-      available: leaveBalancesData.data.ANNUAL.remainingDays,
-      used: leaveBalancesData.data.ANNUAL.usedDays
-    },
-    {
-      type: LeaveType.SICK,
-      total: leaveBalancesData.data.SICK.totalDays,
-      available: leaveBalancesData.data.SICK.remainingDays,
-      used: leaveBalancesData.data.SICK.usedDays
-    },
-    {
-      type: LeaveType.MATERNITY,
-      total: leaveBalancesData.data.MATERNITY.totalDays,
-      available: leaveBalancesData.data.MATERNITY.remainingDays,
-      used: leaveBalancesData.data.MATERNITY.usedDays
-    },
-    {
-      type: LeaveType.PATERNITY,
-      total: leaveBalancesData.data.PATERNITY.totalDays,
-      available: leaveBalancesData.data.PATERNITY.remainingDays,
-      used: leaveBalancesData.data.PATERNITY.usedDays
-    }
-  ] : [];
+  // Convert API response to LeaveBalance array safely
+  const leaveBalances = leaveBalancesData && leaveBalancesData.data ? 
+    Object.entries(leaveBalancesData.data).map(([type, data]) => {
+      if (!data) return null;
+      return {
+        type: type as LeaveType,
+        total: data.totalDays || 0,
+        available: data.remainingDays || 0,
+        used: data.usedDays || 0
+      };
+    }).filter(Boolean) : [];
 
   return (
     <AppLayout>
@@ -131,7 +116,7 @@ const Dashboard = () => {
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {leaveBalances.map((balance) => (
-                  <LeaveBalanceCard key={balance.type} leaveBalance={balance} />
+                  balance && <LeaveBalanceCard key={balance.type} leaveBalance={balance} />
                 ))}
               </div>
             )}

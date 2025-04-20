@@ -26,7 +26,7 @@ interface LeaveTypeFieldProps {
 }
 
 export function LeaveTypeField({ form }: LeaveTypeFieldProps) {
-  const { data: leaveBalances } = useQuery({
+  const { data: leaveBalances, isLoading } = useQuery({
     queryKey: ['leaveBalances'],
     queryFn: fetchLeaveBalances
   });
@@ -47,10 +47,12 @@ export function LeaveTypeField({ form }: LeaveTypeFieldProps) {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Available Leave Types</SelectLabel>
-                {leaveBalances && Object.entries(leaveBalances.data).map(([type, balance]) => (
-                  <SelectItem key={type} value={type}>
-                    {type === LeaveType.ANNUAL ? 'Annual Leave/PTO' : type} ({balance.remainingDays} days available)
-                  </SelectItem>
+                {leaveBalances && leaveBalances.data && Object.entries(leaveBalances.data).map(([type, balance]) => (
+                  balance && (
+                    <SelectItem key={type} value={type}>
+                      {type === LeaveType.ANNUAL ? 'Annual Leave/PTO' : type} ({balance.remainingDays} days available)
+                    </SelectItem>
+                  )
                 ))}
               </SelectGroup>
             </SelectContent>

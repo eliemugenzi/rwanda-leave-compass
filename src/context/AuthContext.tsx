@@ -1,6 +1,6 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { userProfile } from '@/data/mockData';
+import { loginUser } from '@/services/api';
 
 // Define the user type
 export interface AuthUser {
@@ -10,6 +10,8 @@ export interface AuthUser {
   role: string;
   department: string;
   position: string;
+  firstName: string;
+  lastName: string;
 }
 
 // Define the auth context type
@@ -39,22 +41,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Login function
   const login = async (email: string, password: string): Promise<boolean> => {
-    // In a real app, this would call an API to validate credentials
-    // For now, we'll simulate authentication with our mock data
-    
-    // Simple validation: any non-empty email/password for demo
-    if (!email || !password) {
+    try {
+      const response = await loginUser({ email, password });
+      
+      const authenticatedUser: AuthUser = {
+        id: 'user-id', // This would come from your backend in a real app
+        email: email,
+        role: 'employee',
+        department: 'Technology',
+        position: 'Software Developer',
+        firstName: response.data.firstName,
+        lastName: response.data.lastName,
+        name: `${response.data.firstName} ${response.data.lastName}`
+      };
+      
+      // Store the user in localStorage
+      localStorage.setItem('user', JSON.stringify(authenticatedUser));
+      setUser(authenticatedUser);
+      
+      return true;
+    } catch (error) {
       return false;
     }
-
-    // Use the mock user profile for demonstration
-    const authenticatedUser = { ...userProfile };
-    
-    // Store the user in localStorage
-    localStorage.setItem('user', JSON.stringify(authenticatedUser));
-    setUser(authenticatedUser);
-    
-    return true;
   };
 
   // Logout function

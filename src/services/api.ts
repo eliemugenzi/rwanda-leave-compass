@@ -24,6 +24,8 @@ export interface AuthResponse {
     accessToken: string;
     refreshToken: string;
     tokenType: string | null;
+    firstName: string;
+    lastName: string;
   };
 }
 

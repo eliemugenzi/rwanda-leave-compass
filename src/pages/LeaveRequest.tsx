@@ -1,7 +1,8 @@
 
 import { AppLayout } from "@/components/layout/AppLayout";
 import { toast } from "@/hooks/use-toast";
-import { LeaveRequestForm, LeaveRequestFormValues } from "@/components/leave/LeaveRequestForm";
+import { LeaveRequestForm } from "@/components/leave/LeaveRequestForm";
+import { LeaveRequestFormValues } from "@/validation/leave-request.schema";
 import { LeavePolicy } from "@/components/leave/LeavePolicy";
 import { createLeaveRequest } from "@/services/api";
 import { format } from "date-fns";

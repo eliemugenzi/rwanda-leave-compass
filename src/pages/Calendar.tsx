@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Calendar as CalendarComponent, CalendarProps } from "@/components/ui/calendar";
@@ -122,7 +121,7 @@ const Calendar = () => {
                   booked: (date) => !!getLeaveInfo(date),
                 }}
                 components={{
-                  Day: ({ date: dayDate, ...props }: DayProps) => {
+                  Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
                     const isBooked = !!getLeaveInfo(dayDate);
                     return (
                       <div

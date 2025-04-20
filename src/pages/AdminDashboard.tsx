@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -67,7 +68,9 @@ const AdminDashboard = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-4">Loading requests...</div>
+            <div className="flex justify-center items-center py-4">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
           ) : (
             <LeaveRequestList 
               requests={requests?.data.content || []}
@@ -83,3 +86,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+

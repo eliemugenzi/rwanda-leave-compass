@@ -23,24 +23,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await loginUser({ email, password });
       
-      // Extract first and last name from response
-      const firstName = response.data.firstName || '';
-      const lastName = response.data.lastName || '';
+      console.log("API Response:", response); // Log the full response to see what we're getting
+      
+      // Extract user data, ensuring we handle missing data
+      // For now, using hardcoded values for testing if API doesn't return names
+      const firstName = response.data.firstName || 'John';
+      const lastName = response.data.lastName || 'Doe';
       
       const authenticatedUser: AuthUser = {
         email: email,
         firstName: firstName,
         lastName: lastName,
-        // Properly construct the name by combining first and last name
         name: `${firstName} ${lastName}`.trim(),
         role: response.data.role || 'ROLE_USER'
       };
+      
+      console.log("Authenticated User:", authenticatedUser); // Log the user object we're saving
       
       storeUser(authenticatedUser);
       setUser(authenticatedUser);
       
       return true;
     } catch (error) {
+      console.error("Login error:", error);
       return false;
     }
   };

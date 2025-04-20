@@ -1,4 +1,3 @@
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { toast } from "@/hooks/use-toast";
 import { LeaveRequestForm } from "@/components/leave/LeaveRequestForm";

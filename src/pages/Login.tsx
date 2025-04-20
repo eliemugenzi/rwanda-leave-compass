@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useRouter } from '@/pages-router/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -70,7 +71,6 @@ const Login = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <Logo className="mx-auto mb-4" />
-          <CardTitle className="text-2xl">Time Away</CardTitle>
           <CardDescription>Sign in to access your leave management dashboard</CardDescription>
         </CardHeader>
         <CardContent>

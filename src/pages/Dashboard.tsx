@@ -62,27 +62,27 @@ const Dashboard = () => {
   const leaveBalances = leaveBalancesData ? [
     {
       type: LeaveType.ANNUAL,
-      total: 20,
-      available: leaveBalancesData.data.ANNUAL,
-      used: 20 - leaveBalancesData.data.ANNUAL
+      total: leaveBalancesData.data.ANNUAL.totalDays,
+      available: leaveBalancesData.data.ANNUAL.remainingDays,
+      used: leaveBalancesData.data.ANNUAL.usedDays
     },
     {
       type: LeaveType.SICK,
-      total: 12,
-      available: leaveBalancesData.data.SICK,
-      used: 12 - leaveBalancesData.data.SICK
+      total: leaveBalancesData.data.SICK.totalDays,
+      available: leaveBalancesData.data.SICK.remainingDays,
+      used: leaveBalancesData.data.SICK.usedDays
     },
     {
       type: LeaveType.MATERNITY,
-      total: 90,
-      available: leaveBalancesData.data.MATERNITY,
-      used: 90 - leaveBalancesData.data.MATERNITY
+      total: leaveBalancesData.data.MATERNITY.totalDays,
+      available: leaveBalancesData.data.MATERNITY.remainingDays,
+      used: leaveBalancesData.data.MATERNITY.usedDays
     },
     {
       type: LeaveType.PATERNITY,
-      total: 14,
-      available: leaveBalancesData.data.PATERNITY,
-      used: 14 - leaveBalancesData.data.PATERNITY
+      total: leaveBalancesData.data.PATERNITY.totalDays,
+      available: leaveBalancesData.data.PATERNITY.remainingDays,
+      used: leaveBalancesData.data.PATERNITY.usedDays
     }
   ] : [];
 

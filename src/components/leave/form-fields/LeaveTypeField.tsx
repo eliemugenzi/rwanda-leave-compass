@@ -17,7 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockLeaveBalances } from "@/data/temporaryMockData";
+import { useQuery } from "@tanstack/react-query";
+import { fetchLeaveBalances } from "@/services/api";
 import { LeaveRequestFormValues } from "@/validation/leave-request.schema";
 
 interface LeaveTypeFieldProps {
@@ -25,6 +26,11 @@ interface LeaveTypeFieldProps {
 }
 
 export function LeaveTypeField({ form }: LeaveTypeFieldProps) {
+  const { data: leaveBalances } = useQuery({
+    queryKey: ['leaveBalances'],
+    queryFn: fetchLeaveBalances
+  });
+
   return (
     <FormField
       control={form.control}
@@ -41,9 +47,9 @@ export function LeaveTypeField({ form }: LeaveTypeFieldProps) {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Available Leave Types</SelectLabel>
-                {mockLeaveBalances.map((balance) => (
-                  <SelectItem key={balance.type} value={balance.type}>
-                    {balance.type === LeaveType.ANNUAL ? 'Annual Leave/PTO' : balance.type} ({balance.available} days available)
+                {leaveBalances && Object.entries(leaveBalances.data).map(([type, balance]) => (
+                  <SelectItem key={type} value={type}>
+                    {type === LeaveType.ANNUAL ? 'Annual Leave/PTO' : type} ({balance.remainingDays} days available)
                   </SelectItem>
                 ))}
               </SelectGroup>

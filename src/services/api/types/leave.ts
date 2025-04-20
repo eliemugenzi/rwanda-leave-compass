@@ -1,4 +1,3 @@
-
 import { LeaveType } from '@/types/leave';
 
 export interface PaginatedResponse<T> {
@@ -53,10 +52,16 @@ export interface CreateLeaveRequestResponse {
   data: LeaveRequest;
 }
 
+export interface LeaveBalanceDetails {
+  totalDays: number;
+  usedDays: number;
+  remainingDays: number;
+}
+
 export interface LeaveBalanceResponse {
   message: string;
   status: number;
   data: {
-    [key in LeaveType]: number;
+    [key in LeaveType]: LeaveBalanceDetails;
   };
 }

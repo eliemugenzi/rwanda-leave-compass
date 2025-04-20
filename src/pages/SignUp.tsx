@@ -4,7 +4,7 @@ import { useRouter } from '@/pages-router/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link } from '@/pages-router/navigation';
@@ -12,17 +12,20 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '@/hooks/use-toast';
-import { DEPARTMENTS, JOB_TITLES } from '@/constants/company';
+import { useQuery } from '@tanstack/react-query';
+import { Department, JobTitle } from '@/types/api';
+import { getDepartments, getJobTitles, registerUser } from '@/services/api';
+import { Logo } from '@/components/layout/Logo';
 
 // Form validation schema
 const formSchema = z.object({
   firstName: z.string().min(2, { message: 'First name must be at least 2 characters.' }),
   lastName: z.string().min(2, { message: 'Last name must be at least 2 characters.' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }),
-  department: z.enum(DEPARTMENTS, {
+  departmentId: z.string({
     required_error: 'Please select a department.',
   }),
-  jobTitle: z.enum(JOB_TITLES, {
+  jobTitleId: z.string({
     required_error: 'Please select a job title.',
   }),
   password: z.string()
@@ -41,14 +44,34 @@ const SignUp = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
+  // Fetch departments
+  const { data: departmentsResponse } = useQuery({
+    queryKey: ['departments'],
+    queryFn: getDepartments,
+  });
+
+  const departments = departmentsResponse?.data || [];
+
+  // Fetch job titles when department is selected
+  const { data: jobTitlesResponse, refetch: refetchJobTitles } = useQuery({
+    queryKey: ['jobTitles'],
+    queryFn: () => {
+      const deptId = form.getValues('departmentId');
+      return deptId ? getJobTitles(deptId) : Promise.resolve({ data: [] });
+    },
+    enabled: false,
+  });
+
+  const jobTitles = jobTitlesResponse?.data || [];
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: '',
       lastName: '',
       email: '',
-      department: undefined,
-      jobTitle: undefined,
+      departmentId: '',
+      jobTitleId: '',
       password: '',
     },
   });
@@ -56,8 +79,11 @@ const SignUp = () => {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      // For demo purposes, we'll just use the login function
-      // In a real app, this would be a registration API call
+      await registerUser({
+        ...data,
+        role: 'ROLE_USER',
+      });
+      
       const success = await login(data.email, data.password);
       
       if (success) {
@@ -66,17 +92,11 @@ const SignUp = () => {
           description: 'Welcome to Time Away!',
         });
         router.push('/');
-      } else {
-        toast({
-          title: 'Registration failed',
-          description: 'An error occurred during registration. Please try again.',
-          variant: 'destructive',
-        });
       }
     } catch (error) {
       toast({
-        title: 'Registration error',
-        description: 'An unexpected error occurred. Please try again.',
+        title: 'Registration failed',
+        description: 'An error occurred during registration. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -88,7 +108,7 @@ const SignUp = () => {
     <div className="flex items-center justify-center min-h-screen bg-muted/30">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Time Away</CardTitle>
+          <Logo className="mx-auto mb-4" />
           <CardDescription>Create your account to manage leave requests</CardDescription>
         </CardHeader>
         <CardContent>
@@ -140,20 +160,27 @@ const SignUp = () => {
               />
               <FormField
                 control={form.control}
-                name="department"
+                name="departmentId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Department</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select 
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        form.setValue('jobTitleId', '');
+                        refetchJobTitles();
+                      }} 
+                      value={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select your department" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {DEPARTMENTS.map((dept) => (
-                          <SelectItem key={dept} value={dept}>
-                            {dept}
+                        {departments.map((dept) => (
+                          <SelectItem key={dept.id} value={dept.id}>
+                            {dept.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -164,20 +191,20 @@ const SignUp = () => {
               />
               <FormField
                 control={form.control}
-                name="jobTitle"
+                name="jobTitleId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Job Title</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select your job title" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {JOB_TITLES.map((title) => (
-                          <SelectItem key={title} value={title}>
-                            {title}
+                        {jobTitles.map((title) => (
+                          <SelectItem key={title.id} value={title.id}>
+                            {title.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -220,4 +247,3 @@ const SignUp = () => {
 };
 
 export default SignUp;
-

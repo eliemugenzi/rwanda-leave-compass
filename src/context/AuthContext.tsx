@@ -1,41 +1,24 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { loginUser } from '@/services/api';
+import { AuthContextType, AuthUser } from '@/types/auth';
+import { useAuthStorage } from '@/hooks/useAuthStorage';
 
-// Define the user type
-export interface AuthUser {
-  firstName: string;
-  lastName: string;
-  name: string;
-  email: string;
-  role: string; // Adding back the role property that was removed
-}
-
-// Define the auth context type
-interface AuthContextType {
-  user: AuthUser | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  isLoading: boolean;
-}
-
-// Create the auth context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create the auth provider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { getStoredUser, storeUser, removeUser } = useAuthStorage();
 
-  // Check for existing session on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = getStoredUser();
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(storedUser);
     }
     setIsLoading(false);
   }, []);
 
-  // Login function
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const response = await loginUser({ email, password });
@@ -45,11 +28,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         firstName: response.data.firstName,
         lastName: response.data.lastName,
         name: `${response.data.firstName} ${response.data.lastName}`,
-        role: response.data.role || 'ROLE_USER' // Updated default role to ROLE_USER
+        role: response.data.role || 'ROLE_USER'
       };
       
-      // Store the user in localStorage
-      localStorage.setItem('user', JSON.stringify(authenticatedUser));
+      storeUser(authenticatedUser);
       setUser(authenticatedUser);
       
       return true;
@@ -58,13 +40,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Logout function
   const logout = () => {
-    localStorage.removeItem('user');
+    removeUser();
     setUser(null);
   };
 
-  // Return the provider with the auth value
   return (
     <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
@@ -72,7 +52,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-// Create a hook to use the auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

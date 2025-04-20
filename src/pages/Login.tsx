@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useRouter } from '@/pages-router/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -11,6 +10,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '@/hooks/use-toast';
+import { Logo } from '@/components/layout/Logo';
 
 // Form validation schema
 const formSchema = z.object({
@@ -69,6 +69,7 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen bg-muted/30">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <Logo className="mx-auto mb-4" />
           <CardTitle className="text-2xl">Time Away</CardTitle>
           <CardDescription>Sign in to access your leave management dashboard</CardDescription>
         </CardHeader>
@@ -122,4 +123,3 @@ const Login = () => {
 };
 
 export default Login;
-

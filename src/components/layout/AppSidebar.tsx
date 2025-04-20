@@ -1,4 +1,3 @@
-
 import {
   Calendar,
   Clock,
@@ -27,6 +26,7 @@ import {
 
 import { Link } from "@/pages-router/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { Logo } from "./Logo";
 
 export function AppSidebar() {
   const { user } = useAuth();
@@ -87,9 +87,7 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="flex items-center px-4 py-2">
-        <div className="flex items-center space-x-2">
-          <span className="font-bold text-lg text-sidebar-foreground">RwandaLeaveCompass</span>
-        </div>
+        <Logo />
         <SidebarTrigger className="ml-auto">
           <Menu className="h-4 w-4" />
         </SidebarTrigger>

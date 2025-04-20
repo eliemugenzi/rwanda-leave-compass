@@ -23,11 +23,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await loginUser({ email, password });
       
+      // Extract first and last name from response
+      const firstName = response.data.firstName || '';
+      const lastName = response.data.lastName || '';
+      
       const authenticatedUser: AuthUser = {
         email: email,
-        firstName: response.data.firstName,
-        lastName: response.data.lastName,
-        name: `${response.data.firstName} ${response.data.lastName}`,
+        firstName: firstName,
+        lastName: lastName,
+        // Properly construct the name by combining first and last name
+        name: `${firstName} ${lastName}`.trim(),
         role: response.data.role || 'ROLE_USER'
       };
       

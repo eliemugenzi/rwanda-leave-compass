@@ -3,24 +3,45 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockLeaveRequests, employees } from "@/data/mockData";
+import { mockLeaveRequests as typedMockLeaveRequests, employees } from "@/data/mockData";
 import { LeaveRequestList } from "@/components/leave/LeaveRequestList";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Users } from "lucide-react";
+import { LeaveRequest } from "@/services/api";
 
 const SupervisorDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   
+  // Convert the mock data to match the API response structure
+  const mockLeaveRequests: LeaveRequest[] = typedMockLeaveRequests.map(leave => ({
+    id: leave.id,
+    employeeName: leave.supervisorName || "Employee Name",
+    type: leave.type,
+    startDate: leave.startDate,
+    endDate: leave.endDate,
+    reason: leave.reason,
+    status: leave.status.toUpperCase() as any,
+    rejectionReason: null,
+    approver: leave.supervisorId ? {
+      id: leave.supervisorId,
+      firstName: (leave.supervisorName || "").split(" ")[0] || "",
+      lastName: (leave.supervisorName || "").split(" ")[1] || "",
+      email: `${leave.supervisorName?.toLowerCase().replace(" ", ".")}@company.com` || "",
+    } : null,
+    createdAt: leave.createdAt,
+    updatedAt: leave.createdAt,
+  }));
+  
   // Filter leaves by status for the supervisor view
   const pendingLeaves = mockLeaveRequests.filter(
-    (leave) => leave.status === "Pending"
+    (leave) => leave.status === "PENDING"
   );
   const approvedLeaves = mockLeaveRequests.filter(
-    (leave) => leave.status === "Approved"
+    (leave) => leave.status === "APPROVED"
   );
   const rejectedLeaves = mockLeaveRequests.filter(
-    (leave) => leave.status === "Rejected"
+    (leave) => leave.status === "REJECTED"
   );
 
   return (

@@ -1,3 +1,4 @@
+
 import {
   Calendar,
   Clock,
@@ -30,31 +31,45 @@ import { Logo } from "./Logo";
 
 export function AppSidebar() {
   const { user } = useAuth();
-  
+
+  // Identify admin and HR users (case-insensitive, supports both if HR exists)
+  const isAdminOrHR =
+    user &&
+    (
+      (user.role && user.role.toLowerCase().includes("admin")) ||
+      (user.role && user.role.toLowerCase().includes("hr"))
+    );
+
   const isSupervisor = user?.role === "supervisor" || user?.role === "admin";
-  
-  // Navigation items for the sidebar
+
+  // Navigation items for the sidebar (conditional by user role)
+  // Show "Request Leave" and "My Leaves" only for regular users (not admin or HR)
   const mainNavItems = [
     {
       title: "Dashboard",
       icon: Home,
       url: "/",
     },
-    {
-      title: "Request Leave",
-      icon: FileText,
-      url: "/request",
-    },
-    {
-      title: "My Leaves",
-      icon: Clock,
-      url: "/my-leaves",
-    },
+    // Only show when NOT admin or HR
+    ...(!isAdminOrHR
+      ? [
+          {
+            title: "Request Leave",
+            icon: FileText,
+            url: "/request",
+          },
+          {
+            title: "My Leaves",
+            icon: Clock,
+            url: "/my-leaves",
+          }
+        ]
+      : []),
     {
       title: "Calendar",
       icon: Calendar,
       url: "/calendar",
-    },
+    }
   ];
 
   // If user is a supervisor, add the supervisor dashboard link
@@ -136,3 +151,4 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+

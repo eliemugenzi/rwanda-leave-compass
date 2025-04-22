@@ -9,7 +9,7 @@ import { fetchUserLeaveRequests, fetchAllLeaveRequests } from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
 import { LeaveRequestHeader } from "@/components/leave/LeaveRequestHeader";
 import { LeaveRequestInfo } from "@/components/leave/LeaveRequestInfo";
-import { LeaveType } from "@/types/leave";
+import { LeaveType, LeaveStatus } from "@/types/leave";
 
 const LeaveDetails = () => {
   const router = useRouter();
@@ -43,16 +43,17 @@ const LeaveDetails = () => {
     queryFn: () => fetchAllLeaveRequests(),
   });
 
-  // Find the request and convert the type from string to LeaveType enum
+  // Find the request and convert the type and status from string to their respective enums
   const leaveRequest = id ? (() => {
     const foundRequest = (userLeaveRequestsResponse?.data.content || []).find(req => req.id === id) ||
       (allLeaveRequestsResponse?.data.content || []).find(req => req.id === id);
     
     if (foundRequest) {
-      // Convert the string type to LeaveType enum
+      // Convert the string type and status to their respective enums
       return {
         ...foundRequest,
-        type: foundRequest.type as unknown as LeaveType
+        type: foundRequest.type as unknown as LeaveType,
+        status: foundRequest.status as unknown as LeaveStatus
       };
     }
     return null;

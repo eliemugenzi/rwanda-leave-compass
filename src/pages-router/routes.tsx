@@ -1,4 +1,3 @@
-
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import AdminDashboard from '@/pages/AdminDashboard';
 import Calendar from '@/pages/Calendar';
@@ -77,14 +76,6 @@ export const routes: Route[] = [
   },
   {
     path: '/leave/:id',
-    element: (
-      <ProtectedRoute>
-        <LeaveDetails />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/leave-details/:id',
     element: (
       <ProtectedRoute>
         <LeaveDetails />

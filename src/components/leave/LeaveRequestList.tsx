@@ -68,7 +68,7 @@ export function LeaveRequestList({
   };
 
   const viewLeaveDetails = (id: string) => {
-    router.push(`/leave-details/${id}`);
+    router.push(`/leave/${id}`);
   };
 
   const renderPaginationItems = () => {

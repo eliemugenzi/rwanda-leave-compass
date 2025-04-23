@@ -7,9 +7,7 @@ import { SignUpFormFields } from '@/components/auth/SignUpFormFields';
 import { useSignUpForm } from '@/hooks/useSignUpForm';
 import { Separator } from '@/components/ui/separator';
 import { BASE_URL } from '@/services/api/config';
-import { icons } from 'lucide-react';
-
-const Microsoft = icons["microsoft"];
+import { Microsoft } from 'lucide-react';
 
 const SignUp = () => {
   const {

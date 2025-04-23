@@ -1,17 +1,27 @@
-
 import { DayProps } from "react-day-picker";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
+import { LeaveEmployeeListPopover } from "./LeaveEmployeeListPopover";
+import { useAuth } from "@/context/AuthContext";
 
 interface CalendarViewProps {
   date: Date;
   onDateSelect: (date: Date | undefined) => void;
-  getLeaveInfo: (date: Date) => { type: string; status: string; } | undefined;
+  getLeaveInfo: (date: Date) => { type: string; status: string; employeeName?: string } | undefined;
   getLeaveDayClassName: (date: Date) => string;
+  getEmployeesOnLeave?: (date: Date) => string[] | undefined;
+  showEmployeePopover?: boolean;
 }
 
-export const CalendarView = ({ date, onDateSelect, getLeaveInfo, getLeaveDayClassName }: CalendarViewProps) => {
+export const CalendarView = ({
+  date,
+  onDateSelect,
+  getLeaveInfo,
+  getLeaveDayClassName,
+  getEmployeesOnLeave,
+  showEmployeePopover = false
+}: CalendarViewProps) => {
   return (
     <Card>
       <CardHeader>
@@ -35,7 +45,12 @@ export const CalendarView = ({ date, onDateSelect, getLeaveInfo, getLeaveDayClas
           components={{
             Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
               const isBooked = !!getLeaveInfo(dayDate);
-              return (
+              const employees =
+                showEmployeePopover && getEmployeesOnLeave
+                  ? getEmployeesOnLeave(dayDate) || []
+                  : [];
+
+              let dayContent = (
                 <div
                   className={`${props.className || ''} ${isBooked ? getLeaveDayClassName(dayDate) : ''}`}
                   {...props}
@@ -43,7 +58,16 @@ export const CalendarView = ({ date, onDateSelect, getLeaveInfo, getLeaveDayClas
                   {dayDate.getDate()}
                 </div>
               );
-            },
+
+              if (showEmployeePopover && isBooked && employees.length > 0) {
+                dayContent = (
+                  <LeaveEmployeeListPopover employees={employees}>
+                    {dayContent}
+                  </LeaveEmployeeListPopover>
+                );
+              }
+              return dayContent;
+            }
           }}
         />
       </CardContent>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { format, isBefore, isWithinInterval, parseISO } from "date-fns";
@@ -10,6 +9,7 @@ import { LeaveLegend } from "@/components/calendar/LeaveLegend";
 import { ScheduledLeaves } from "@/components/calendar/ScheduledLeaves";
 import { addDays } from "date-fns";
 import { Loader } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
@@ -90,6 +90,24 @@ const Calendar = () => {
     }
   };
 
+  const { user } = useAuth();
+
+  // Determine if the user is admin or HR (assuming role === 'admin' is sufficient, extend as needed)
+  const isAdminOrHR = user?.role === "admin" || user?.role === "hr";
+
+  // Helper to get all employee names on leave for a given date
+  const getEmployeesOnLeave = (date: Date): string[] => {
+    const dateStr = format(date, "yyyy-MM-dd");
+    // Filter by all leaves that match this date
+    const matching = (leaveRequests?.data.content || []).filter(req =>
+      req.status === "APPROVED" &&
+      (format(parseISO(req.startDate), "yyyy-MM-dd") <= dateStr) &&
+      (format(parseISO(req.endDate), "yyyy-MM-dd") >= dateStr)
+    );
+    // Distinct names
+    return Array.from(new Set(matching.map(req => req.employeeName).filter(Boolean)));
+  };
+
   if (isLoading) {
     return (
       <AppLayout>
@@ -117,6 +135,9 @@ const Calendar = () => {
             onDateSelect={(newDate) => newDate && setDate(newDate)}
             getLeaveInfo={getLeaveInfo}
             getLeaveDayClassName={getLeaveDayClassName}
+            // Only show employee popover if admin/HR
+            showEmployeePopover={isAdminOrHR}
+            getEmployeesOnLeave={isAdminOrHR ? getEmployeesOnLeave : undefined}
           />
         </div>
 

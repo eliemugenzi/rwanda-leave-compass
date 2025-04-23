@@ -65,3 +65,14 @@ export interface LeaveBalanceResponse {
     [key in LeaveType]: LeaveBalanceDetails;
   };
 }
+
+export interface UpdateLeaveRequestStatusPayload {
+  status: "APPROVED" | "REJECTED";
+  rejectionReason?: string;
+}
+
+export interface UpdateLeaveRequestStatusResponse {
+  message: string;
+  status: number;
+  data: LeaveRequest;
+}

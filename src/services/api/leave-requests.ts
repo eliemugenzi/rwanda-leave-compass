@@ -1,6 +1,11 @@
-
 import { BASE_URL, fetchWithAuth } from './config';
-import { LeaveRequestResponse, CreateLeaveRequestPayload, CreateLeaveRequestResponse } from './types/leave';
+import { 
+  LeaveRequestResponse, 
+  CreateLeaveRequestPayload, 
+  CreateLeaveRequestResponse, 
+  UpdateLeaveRequestStatusPayload,
+  UpdateLeaveRequestStatusResponse,
+} from './types/leave';
 
 export async function fetchAllLeaveRequests(status?: string, page: number = 0, size: number = 10): Promise<LeaveRequestResponse> {
   const url = new URL(`${BASE_URL}/leave-requests`);
@@ -36,6 +41,21 @@ export async function fetchUserLeaveRequests(status?: string, page: number = 0, 
 export async function createLeaveRequest(payload: CreateLeaveRequestPayload): Promise<CreateLeaveRequestResponse> {
   return fetchWithAuth<CreateLeaveRequestResponse>(`${BASE_URL}/leave-requests`, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
+/**
+ * Approve or reject a leave request (Admin/HR only).
+ * @param id Leave request ID
+ * @param payload status: "APPROVED" | "REJECTED", rejectionReason (string, only required if status is "REJECTED")
+ */
+export async function updateLeaveRequestStatus(id: string, payload: UpdateLeaveRequestStatusPayload): Promise<UpdateLeaveRequestStatusResponse> {
+  return fetchWithAuth<UpdateLeaveRequestStatusResponse>(`${BASE_URL}/leave-requests/${id}`, {
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },

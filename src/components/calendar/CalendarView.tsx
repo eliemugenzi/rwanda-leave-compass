@@ -51,12 +51,13 @@ export const CalendarView = ({
                   ? getEmployeesOnLeave(dayDate) || []
                   : [];
 
-              // Remove displayMonth from props to avoid the React warning
+              // Get className and other props safely
               const { displayMonth, ...dayProps } = props as any;
+              const className = (props as any).className || '';
               
               let dayContent = (
                 <div
-                  className={`${props.className || ''} ${isBooked ? getLeaveDayClassName(dayDate) : ''}`}
+                  className={`${className} ${isBooked ? getLeaveDayClassName(dayDate) : ''}`}
                   {...dayProps}
                 >
                   {dayDate.getDate()}

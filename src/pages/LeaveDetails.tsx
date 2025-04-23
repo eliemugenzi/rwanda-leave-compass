@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { LeaveRequestHeader } from "@/components/leave/LeaveRequestHeader";
 import { LeaveRequestInfo } from "@/components/leave/LeaveRequestInfo";
 import { LeaveType, LeaveStatus } from "@/types/leave";
+import { Loader } from "lucide-react";
 
 const LeaveDetails = () => {
   const router = useRouter();
@@ -65,7 +66,7 @@ const LeaveDetails = () => {
     return (
       <AppLayout>
         <div className="flex items-center justify-center py-16">
-          <p>Loading leave request details...</p>
+          <Loader className="h-8 w-8 animate-spin text-primary" aria-label="Loading leave request details" />
         </div>
       </AppLayout>
     );

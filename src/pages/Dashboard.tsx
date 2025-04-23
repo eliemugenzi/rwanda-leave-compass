@@ -12,6 +12,7 @@ import AdminDashboard from "./AdminDashboard";
 import { useQuery } from "@tanstack/react-query";
 import { LeaveType } from "@/types/leave";
 import { fetchUserLeaveRequests, fetchLeaveBalances } from "@/services/api";
+import { Loader } from "lucide-react";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -39,7 +40,7 @@ const Dashboard = () => {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[200px]">
-          <p>Loading...</p>
+          <Loader className="h-8 w-8 animate-spin text-primary" aria-label="Loading dashboard" />
         </div>
       </AppLayout>
     );
@@ -107,11 +108,8 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             {isLoadingBalances ? (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <div className="h-24 rounded-md bg-muted animate-pulse" />
-                <div className="h-24 rounded-md bg-muted animate-pulse" />
-                <div className="h-24 rounded-md bg-muted animate-pulse" />
-                <div className="h-24 rounded-md bg-muted animate-pulse" />
+              <div className="flex justify-center items-center h-24">
+                <Loader className="h-6 w-6 animate-spin text-primary" aria-label="Loading leave balances" />
               </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -132,7 +130,9 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             {isLoadingRequests ? (
-              <div className="text-center py-4">Loading your requests...</div>
+              <div className="flex justify-center items-center h-24">
+                <Loader className="h-6 w-6 animate-spin text-primary" aria-label="Loading your requests" />
+              </div>
             ) : (
               <LeaveRequestList 
                 requests={userLeaveRequests?.data.content || []} 

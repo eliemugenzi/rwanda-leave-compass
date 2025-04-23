@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +6,7 @@ import { LeaveRequestList } from "@/components/leave/LeaveRequestList";
 import { useQuery } from "@tanstack/react-query";
 import { fetchUserLeaveRequests } from "@/services/api";
 import { LeaveStatus } from "@/types/leave";
+import { Loader } from "lucide-react";
 
 const MyLeaves = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -40,7 +40,7 @@ const MyLeaves = () => {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[200px]">
-          <p>Loading your leave requests...</p>
+          <Loader className="h-8 w-8 animate-spin text-primary" aria-label="Loading your leave requests" />
         </div>
       </AppLayout>
     );

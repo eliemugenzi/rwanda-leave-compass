@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Search, Loader2 } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
+import { Loader } from "lucide-react";
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -93,7 +94,7 @@ const AdminDashboard = () => {
         <CardContent>
           {isLoading ? (
             <div className="flex justify-center items-center py-4">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <Loader className="h-8 w-8 animate-spin text-primary" aria-label="Loading leave requests" />
             </div>
           ) : (
             <LeaveRequestList 

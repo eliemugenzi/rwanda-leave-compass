@@ -9,6 +9,7 @@ import { CalendarView } from "@/components/calendar/CalendarView";
 import { LeaveLegend } from "@/components/calendar/LeaveLegend";
 import { ScheduledLeaves } from "@/components/calendar/ScheduledLeaves";
 import { addDays } from "date-fns";
+import { Loader } from "lucide-react";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
@@ -92,8 +93,9 @@ const Calendar = () => {
   if (isLoading) {
     return (
       <AppLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <p>Loading calendar...</p>
+        <div className="flex flex-col items-center justify-center min-h-screen">
+          <Loader className="h-8 w-8 animate-spin text-primary mb-2" aria-label="Loading calendar" />
+          <span className="text-muted-foreground">Loading calendar...</span>
         </div>
       </AppLayout>
     );

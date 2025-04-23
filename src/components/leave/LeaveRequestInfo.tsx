@@ -2,16 +2,12 @@
 import { Calendar, Clock, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { formatDate, calculateDuration, getStatusBadgeStyle } from "@/utils/leaveRequestUtils";
 import { LeaveRequest, LeaveStatus } from "@/types/leave";
-import { toast } from "@/hooks/use-toast";
-import { useRouter } from "@/pages-router/navigation";
-import { useState } from "react";
-import { updateLeaveRequestStatus } from "@/services/api";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/context/AuthContext";
+import { ReviewedComment } from "./ReviewedComment";
+import { RejectionReason } from "./RejectionReason";
+import { ReviewActions } from "./ReviewActions";
 
 interface LeaveRequestInfoProps {
   leaveRequest: LeaveRequest;
@@ -20,91 +16,15 @@ interface LeaveRequestInfoProps {
 }
 
 export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: LeaveRequestInfoProps) => {
-  const router = useRouter();
   const { user } = useAuth();
-  const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showRejectConfirm, setShowRejectConfirm] = useState(false);
-  const [showApproveConfirm, setShowApproveConfirm] = useState(false);
   const isPending = leaveRequest.status === LeaveStatus.PENDING;
 
-  // Smart label: decide whose comment to show
-  const showApproverComment = isAdminOrHR ? leaveRequest.approverComment : leaveRequest.supervisorComment;
-  const approverName = isAdminOrHR ? leaveRequest.approverName : leaveRequest.supervisorName;
+  // Determine the correct properties for reviewed comment
+  const approverComment = (leaveRequest as any).approverComment; // from backend sometimes
+  const supervisorComment = leaveRequest.supervisorComment;
+  const approverName = (leaveRequest as any).approverName;
+  const supervisorName = leaveRequest.supervisorName;
   const reviewedAt = leaveRequest.reviewedAt;
-
-  // COMMENT SUBMISSION
-  const handleApprove = async () => {
-    setIsSubmitting(true);
-    try {
-      const payload: any = {
-        status: "APPROVED"
-      };
-      if (isAdminOrHR) {
-        payload.approverComment = comment.trim();
-      } else if (isSupervisor) {
-        payload.supervisorComment = comment.trim();
-      }
-      await updateLeaveRequestStatus(leaveRequest.id, payload);
-      toast({
-        title: "Leave request approved",
-        description: "The employee has been notified about your decision.",
-      });
-      // Reload page or redirect
-      router.push("/supervisor-dashboard");
-    } catch (error) {
-      console.error("Error approving leave request:", error);
-      toast({
-        title: "Error approving request",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-      setShowApproveConfirm(false);
-    }
-  };
-
-  const handleReject = async () => {
-    if (!comment.trim()) {
-      toast({
-        title: "Comment required",
-        description: "Please provide a reason for rejecting this leave request.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const payload: any = {
-        status: "REJECTED",
-        rejectionReason: comment.trim(),
-      };
-      if (isAdminOrHR) {
-        payload.approverComment = comment.trim();
-      } else if (isSupervisor) {
-        payload.supervisorComment = comment.trim();
-      }
-      await updateLeaveRequestStatus(leaveRequest.id, payload);
-      toast({
-        title: "Leave request rejected",
-        description: "The employee has been notified about your decision.",
-      });
-      // Reload page or redirect
-      router.push("/supervisor-dashboard");
-    } catch (error) {
-      console.error("Error rejecting leave request:", error);
-      toast({
-        title: "Error rejecting request",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-      setShowRejectConfirm(false);
-    }
-  };
 
   return (
     <Card>
@@ -159,104 +79,25 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
               </div>
             </div>
             {/* Approver or supervisor comment */}
-            {showApproverComment && (
-              <div>
-                <p className="font-medium mb-1">
-                  {isAdminOrHR ? "Approver Comment" : "Supervisor Comment"}
-                </p>
-                <div className="bg-muted p-3 rounded-md text-sm">
-                  {showApproverComment}
-                </div>
-                {(approverName || reviewedAt) && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    - {approverName ?? ""} {reviewedAt ? `(${formatDate(reviewedAt)})` : ""}
-                  </p>
-                )}
-              </div>
-            )}
-            {leaveRequest.rejectionReason && (
-              <div>
-                <p className="font-medium mb-1">Rejection Reason</p>
-                <div className="bg-muted p-3 rounded-md text-sm text-destructive">
-                  {leaveRequest.rejectionReason}
-                </div>
-              </div>
-            )}
+            <ReviewedComment
+              isAdminOrHR={isAdminOrHR}
+              approverComment={approverComment}
+              supervisorComment={supervisorComment}
+              approverName={approverName}
+              supervisorName={supervisorName}
+              reviewedAt={reviewedAt}
+            />
+            {/* Rejection Reason */}
+            <RejectionReason rejectionReason={leaveRequest.rejectionReason} />
           </div>
         </div>
       </CardContent>
+      {/* Review Actions */}
       {(isAdminOrHR || isSupervisor) && isPending && (
         <CardFooter className="flex-col items-stretch border-t pt-6">
-          <h3 className="font-semibold mb-2">Review Leave Request</h3>
-          <Textarea
-            placeholder="Add your comments here..."
-            className="mb-4"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-          <div className="flex gap-3 justify-end">
-            <Button 
-              variant="destructive" 
-              disabled={isSubmitting}
-              onClick={() => setShowRejectConfirm(true)}
-            >
-              Reject Request
-            </Button>
-            <Button 
-              variant="default"
-              disabled={isSubmitting}
-              onClick={() => setShowApproveConfirm(true)}
-            >
-              Approve Request
-            </Button>
-          </div>
+          <ReviewActions leaveRequest={leaveRequest} isAdminOrHR={isAdminOrHR} isSupervisor={isSupervisor} />
         </CardFooter>
       )}
-      {/* Approve Confirmation Dialog */}
-      <AlertDialog open={showApproveConfirm} onOpenChange={setShowApproveConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Approve Leave Request</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to approve this leave request? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleApprove} 
-              disabled={isSubmitting}
-              className="bg-primary hover:bg-primary/90"
-            >
-              Approve
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      {/* Reject Confirmation Dialog */}
-      <AlertDialog open={showRejectConfirm} onOpenChange={setShowRejectConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Reject Leave Request</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to reject this leave request? This action cannot be undone.
-              {!comment.trim() && (
-                <p className="text-destructive mt-2">Please provide a reason for rejection in the comment field.</p>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleReject} 
-              disabled={isSubmitting || !comment.trim()}
-              className="bg-destructive hover:bg-destructive/90"
-            >
-              Reject
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </Card>
   );
 };

@@ -34,12 +34,12 @@ const LeaveDetails = () => {
   }, []);
 
   const { data: userLeaveRequestsResponse, isLoading: isLoadingUserRequests } = useQuery({
-    queryKey: ['leaveRequests', 'me'],
+    queryKey: ['leaveRequests', 'me', id],
     queryFn: () => fetchUserLeaveRequests(),
   });
 
   const { data: allLeaveRequestsResponse, isLoading: isLoadingAllRequests } = useQuery({
-    queryKey: ['leaveRequests', 'all'],
+    queryKey: ['leaveRequests', 'all', id],
     queryFn: () => fetchAllLeaveRequests(),
   });
 

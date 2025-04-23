@@ -9,6 +9,8 @@ import { LeaveRequest, LeaveStatus } from "@/types/leave";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/pages-router/navigation";
 import { useState } from "react";
+import { updateLeaveRequestStatus } from "@/services/api";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface LeaveRequestInfoProps {
   leaveRequest: LeaveRequest;
@@ -20,21 +22,34 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
   const router = useRouter();
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showRejectConfirm, setShowRejectConfirm] = useState(false);
+  const [showApproveConfirm, setShowApproveConfirm] = useState(false);
   const isPending = leaveRequest.status === LeaveStatus.PENDING;
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      await updateLeaveRequestStatus(leaveRequest.id, { status: "APPROVED" });
       toast({
         title: "Leave request approved",
         description: "The employee has been notified about your decision.",
       });
-      setIsSubmitting(false);
+      // Reload page or redirect
       router.push("/supervisor-dashboard");
-    }, 1000);
+    } catch (error) {
+      console.error("Error approving leave request:", error);
+      toast({
+        title: "Error approving request",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+      setShowApproveConfirm(false);
+    }
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!comment.trim()) {
       toast({
         title: "Comment required",
@@ -45,14 +60,28 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      await updateLeaveRequestStatus(leaveRequest.id, { 
+        status: "REJECTED", 
+        rejectionReason: comment 
+      });
       toast({
         title: "Leave request rejected",
         description: "The employee has been notified about your decision.",
       });
-      setIsSubmitting(false);
+      // Reload page or redirect
       router.push("/supervisor-dashboard");
-    }, 1000);
+    } catch (error) {
+      console.error("Error rejecting leave request:", error);
+      toast({
+        title: "Error rejecting request",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+      setShowRejectConfirm(false);
+    }
   };
 
   return (
@@ -123,11 +152,20 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
                 </p>
               </div>
             )}
+            
+            {leaveRequest.rejectionReason && (
+              <div>
+                <p className="font-medium mb-1">Rejection Reason</p>
+                <div className="bg-muted p-3 rounded-md text-sm text-destructive">
+                  {leaveRequest.rejectionReason}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
 
-      {isSupervisor && isPending && (
+      {(isAdminOrHR || isSupervisor) && isPending && (
         <CardFooter className="flex-col items-stretch border-t pt-6">
           <h3 className="font-semibold mb-2">Review Leave Request</h3>
           <Textarea
@@ -140,20 +178,67 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
             <Button 
               variant="destructive" 
               disabled={isSubmitting}
-              onClick={handleReject}
+              onClick={() => setShowRejectConfirm(true)}
             >
               Reject Request
             </Button>
             <Button 
               variant="default"
               disabled={isSubmitting}
-              onClick={handleApprove}
+              onClick={() => setShowApproveConfirm(true)}
             >
               Approve Request
             </Button>
           </div>
         </CardFooter>
       )}
+
+      {/* Approve Confirmation Dialog */}
+      <AlertDialog open={showApproveConfirm} onOpenChange={setShowApproveConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Approve Leave Request</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to approve this leave request? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleApprove} 
+              disabled={isSubmitting}
+              className="bg-primary hover:bg-primary/90"
+            >
+              Approve
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reject Confirmation Dialog */}
+      <AlertDialog open={showRejectConfirm} onOpenChange={setShowRejectConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reject Leave Request</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to reject this leave request? This action cannot be undone.
+              {!comment.trim() && (
+                <p className="text-destructive mt-2">Please provide a reason for rejection in the comment field.</p>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleReject} 
+              disabled={isSubmitting || !comment.trim()}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Reject
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };

@@ -7,7 +7,7 @@ import { SignUpFormFields } from '@/components/auth/SignUpFormFields';
 import { useSignUpForm } from '@/hooks/useSignUpForm';
 import { Separator } from '@/components/ui/separator';
 import { BASE_URL } from '@/services/api/config';
-import { Microsoft } from 'lucide-react';
+import { Linkedin } from 'lucide-react';
 
 const SignUp = () => {
   const {
@@ -49,7 +49,7 @@ const SignUp = () => {
               className="w-full"
               onClick={handleMicrosoftLogin}
             >
-              <Microsoft className="mr-2 h-4 w-4" />
+              <Linkedin className="mr-2 h-4 w-4" />
               Sign up with Microsoft
             </Button>
 

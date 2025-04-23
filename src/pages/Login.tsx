@@ -6,7 +6,7 @@ import { LoginFormFields } from '@/components/auth/LoginFormFields';
 import { useLoginForm } from '@/hooks/useLoginForm';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Microsoft } from 'lucide-react';
+import { Globe } from 'lucide-react';
 
 const Login = () => {
   const { form, isLoading, onSubmit } = useLoginForm();
@@ -29,7 +29,7 @@ const Login = () => {
               className="w-full" 
               onClick={handleMicrosoftLogin}
             >
-              <Microsoft className="mr-2 h-4 w-4" />
+              <Globe className="mr-2 h-4 w-4" />
               Sign in with Microsoft
             </Button>
             

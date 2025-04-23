@@ -38,7 +38,7 @@ const PagesRouter: React.FC = () => {
     });
 
     if (exactRoute) {
-      return <exactRoute.component />;
+      return exactRoute.element;
     }
 
     // If no exact match, try to match dynamic routes
@@ -59,13 +59,13 @@ const PagesRouter: React.FC = () => {
     });
 
     if (dynamicRoute) {
-      return <dynamicRoute.component />;
+      return dynamicRoute.element;
     }
 
     // If no match found, use the 404 (catch-all) route
     const notFoundRoute = routes.find(route => route.path === '*');
     if (notFoundRoute) {
-      return <notFoundRoute.component />;
+      return notFoundRoute.element;
     }
 
     // Fallback if somehow no 404 route is defined

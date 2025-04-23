@@ -11,6 +11,7 @@ import { useRouter } from "@/pages-router/navigation";
 import { useState } from "react";
 import { updateLeaveRequestStatus } from "@/services/api";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useAuth } from "@/context/AuthContext";
 
 interface LeaveRequestInfoProps {
   leaveRequest: LeaveRequest;
@@ -20,16 +21,31 @@ interface LeaveRequestInfoProps {
 
 export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: LeaveRequestInfoProps) => {
   const router = useRouter();
+  const { user } = useAuth();
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRejectConfirm, setShowRejectConfirm] = useState(false);
   const [showApproveConfirm, setShowApproveConfirm] = useState(false);
   const isPending = leaveRequest.status === LeaveStatus.PENDING;
 
+  // Smart label: decide whose comment to show
+  const showApproverComment = isAdminOrHR ? leaveRequest.approverComment : leaveRequest.supervisorComment;
+  const approverName = isAdminOrHR ? leaveRequest.approverName : leaveRequest.supervisorName;
+  const reviewedAt = leaveRequest.reviewedAt;
+
+  // COMMENT SUBMISSION
   const handleApprove = async () => {
     setIsSubmitting(true);
     try {
-      await updateLeaveRequestStatus(leaveRequest.id, { status: "APPROVED" });
+      const payload: any = {
+        status: "APPROVED"
+      };
+      if (isAdminOrHR) {
+        payload.approverComment = comment.trim();
+      } else if (isSupervisor) {
+        payload.supervisorComment = comment.trim();
+      }
+      await updateLeaveRequestStatus(leaveRequest.id, payload);
       toast({
         title: "Leave request approved",
         description: "The employee has been notified about your decision.",
@@ -61,10 +77,16 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
 
     setIsSubmitting(true);
     try {
-      await updateLeaveRequestStatus(leaveRequest.id, { 
-        status: "REJECTED", 
-        rejectionReason: comment 
-      });
+      const payload: any = {
+        status: "REJECTED",
+        rejectionReason: comment.trim(),
+      };
+      if (isAdminOrHR) {
+        payload.approverComment = comment.trim();
+      } else if (isSupervisor) {
+        payload.supervisorComment = comment.trim();
+      }
+      await updateLeaveRequestStatus(leaveRequest.id, payload);
       toast({
         title: "Leave request rejected",
         description: "The employee has been notified about your decision.",
@@ -93,8 +115,7 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
             <CardDescription>
               Requested on {formatDate(leaveRequest.createdAt)}
             </CardDescription>
-            
-            {isAdminOrHR && leaveRequest.employeeName && (
+            {(leaveRequest.employeeName) && (
               <div className="mt-2 text-sm text-muted-foreground">
                 Requested by <span className="font-semibold">{leaveRequest.employeeName}</span>
               </div>
@@ -105,7 +126,6 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
           </Badge>
         </div>
       </CardHeader>
-
       <CardContent className="pt-4 pb-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-4">
@@ -118,7 +138,6 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
                 </p>
               </div>
             </div>
-            
             <div className="flex items-start">
               <Clock className="h-5 w-5 mr-2 text-muted-foreground" />
               <div>
@@ -129,7 +148,6 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
               </div>
             </div>
           </div>
-          
           <div className="space-y-4">
             <div className="flex items-start">
               <FileText className="h-5 w-5 mr-2 text-muted-foreground" />
@@ -140,19 +158,22 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
                 </p>
               </div>
             </div>
-            
-            {leaveRequest.supervisorComment && (
+            {/* Approver or supervisor comment */}
+            {showApproverComment && (
               <div>
-                <p className="font-medium mb-1">Supervisor Comment</p>
-                <div className="bg-muted p-3 rounded-md text-sm">
-                  {leaveRequest.supervisorComment}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  - {leaveRequest.supervisorName} ({leaveRequest.reviewedAt ? formatDate(leaveRequest.reviewedAt) : ''})
+                <p className="font-medium mb-1">
+                  {isAdminOrHR ? "Approver Comment" : "Supervisor Comment"}
                 </p>
+                <div className="bg-muted p-3 rounded-md text-sm">
+                  {showApproverComment}
+                </div>
+                {(approverName || reviewedAt) && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    - {approverName ?? ""} {reviewedAt ? `(${formatDate(reviewedAt)})` : ""}
+                  </p>
+                )}
               </div>
             )}
-            
             {leaveRequest.rejectionReason && (
               <div>
                 <p className="font-medium mb-1">Rejection Reason</p>
@@ -164,7 +185,6 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
           </div>
         </div>
       </CardContent>
-
       {(isAdminOrHR || isSupervisor) && isPending && (
         <CardFooter className="flex-col items-stretch border-t pt-6">
           <h3 className="font-semibold mb-2">Review Leave Request</h3>
@@ -192,7 +212,6 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
           </div>
         </CardFooter>
       )}
-
       {/* Approve Confirmation Dialog */}
       <AlertDialog open={showApproveConfirm} onOpenChange={setShowApproveConfirm}>
         <AlertDialogContent>
@@ -214,7 +233,6 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
       {/* Reject Confirmation Dialog */}
       <AlertDialog open={showRejectConfirm} onOpenChange={setShowRejectConfirm}>
         <AlertDialogContent>

@@ -1,3 +1,4 @@
+
 import { LeaveType } from '@/types/leave';
 
 export interface PaginatedResponse<T> {
@@ -37,6 +38,8 @@ export interface LeaveRequest {
   supervisorComment?: string;
   supervisorName?: string;
   reviewedAt?: string;
+  approverComment?: string; // for admin/hr
+  approverName?: string;    // for admin/hr
 }
 
 export interface CreateLeaveRequestPayload {
@@ -69,6 +72,8 @@ export interface LeaveBalanceResponse {
 export interface UpdateLeaveRequestStatusPayload {
   status: "APPROVED" | "REJECTED";
   rejectionReason?: string;
+  supervisorComment?: string;
+  approverComment?: string; // for admin/hr
 }
 
 export interface UpdateLeaveRequestStatusResponse {
@@ -76,3 +81,4 @@ export interface UpdateLeaveRequestStatusResponse {
   status: number;
   data: LeaveRequest;
 }
+

@@ -1,4 +1,3 @@
-
 import { LeaveType } from '@/types/leave';
 
 export interface PaginatedResponse<T> {
@@ -81,4 +80,3 @@ export interface UpdateLeaveRequestStatusResponse {
   status: number;
   data: LeaveRequest;
 }
-

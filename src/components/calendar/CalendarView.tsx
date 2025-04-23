@@ -1,3 +1,4 @@
+
 import { DayProps } from "react-day-picker";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,29 +44,33 @@ export const CalendarView = ({
             booked: (date) => !!getLeaveInfo(date),
           }}
           components={{
-            Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
+            Day: ({ date: dayDate, ...props }: DayProps) => {
               const isBooked = !!getLeaveInfo(dayDate);
               const employees =
                 showEmployeePopover && getEmployeesOnLeave
                   ? getEmployeesOnLeave(dayDate) || []
                   : [];
 
+              // Remove displayMonth from props to avoid the React warning
+              const { displayMonth, ...dayProps } = props as any;
+              
               let dayContent = (
                 <div
                   className={`${props.className || ''} ${isBooked ? getLeaveDayClassName(dayDate) : ''}`}
-                  {...props}
+                  {...dayProps}
                 >
                   {dayDate.getDate()}
                 </div>
               );
 
               if (showEmployeePopover && isBooked && employees.length > 0) {
-                dayContent = (
+                return (
                   <LeaveEmployeeListPopover employees={employees}>
                     {dayContent}
                   </LeaveEmployeeListPopover>
                 );
               }
+              
               return dayContent;
             }
           }}

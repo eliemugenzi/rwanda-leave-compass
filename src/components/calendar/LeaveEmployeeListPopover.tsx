@@ -15,7 +15,7 @@ export const LeaveEmployeeListPopover = ({ employees, children }: LeaveEmployeeL
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="w-full h-full cursor-pointer">
+        <div className="cursor-pointer">
           {children}
         </div>
       </PopoverTrigger>
@@ -25,8 +25,8 @@ export const LeaveEmployeeListPopover = ({ employees, children }: LeaveEmployeeL
           <span className="font-medium text-sm">Employees on Leave</span>
         </div>
         <ul className="list-disc list-inside text-sm text-muted-foreground max-h-32 overflow-auto">
-          {employees.map((name) => (
-            <li key={name}>{name}</li>
+          {employees.map((name, index) => (
+            <li key={`${name}-${index}`}>{name}</li>
           ))}
         </ul>
       </PopoverContent>

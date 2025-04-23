@@ -7,12 +7,20 @@ import { useLoginForm } from '@/hooks/useLoginForm';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Globe } from 'lucide-react';
+import { BASE_URL } from '@/services/api/config';
 
 const Login = () => {
   const { form, isLoading, onSubmit } = useLoginForm();
 
+  /**
+   * Remove trailing /api/v1 segment from BASE_URL to get the root server URL
+   * Then append the oauth path.
+   */
   const handleMicrosoftLogin = () => {
-    window.location.href = '/oauth2/authorization/azure-ad';
+    // Remove '/api/v1' if it is at the end of BASE_URL
+    let rootUrl = BASE_URL.replace(/\/api\/v1\/?$/, ''); 
+    const oauthUrl = `${rootUrl}/oauth2/authorization/azure-ad`;
+    window.location.href = oauthUrl;
   };
 
   return (
@@ -63,3 +71,4 @@ const Login = () => {
 };
 
 export default Login;
+

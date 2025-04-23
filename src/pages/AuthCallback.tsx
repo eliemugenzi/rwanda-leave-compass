@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useRouter } from '@/pages-router/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -17,9 +16,9 @@ const AuthCallback = () => {
   useEffect(() => {
     const processOAuthResponse = async () => {
       try {
-        // If we already have a user, redirect to home
+        // If we already have a user, redirect to dashboard
         if (user) {
-          router.replace('/');
+          router.replace('/dashboard');
           return;
         }
 
@@ -85,8 +84,8 @@ const AuthCallback = () => {
           description: 'Welcome back!',
         });
 
-        // Redirect to home page
-        router.replace('/');
+        // Redirect to dashboard page
+        router.replace('/dashboard');
       } catch (err) {
         console.error('Error processing OAuth callback:', err);
         setError('Failed to process authentication response');

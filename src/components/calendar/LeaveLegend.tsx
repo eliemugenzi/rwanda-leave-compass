@@ -26,6 +26,10 @@ export const LeaveLegend = () => {
             <div className="w-4 h-4 rounded-full bg-emerald-500/20"></div>
             <span>Paternity Leave</span>
           </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full bg-cyan-500/20"></div>
+            <span>Compassionate Leave</span>
+          </div>
         </div>
       </CardContent>
     </Card>

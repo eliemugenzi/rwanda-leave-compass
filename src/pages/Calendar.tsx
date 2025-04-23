@@ -33,8 +33,13 @@ const Calendar = () => {
     return dates;
   };
 
-  // Generate all leave dates
-  const allLeaveDates = (leaveRequests?.data.content || []).flatMap((request) => {
+  // Only include APPROVED leaves (new filtering)
+  const approvedLeaveRequests = (leaveRequests?.data.content || []).filter(
+    (request) => request.status === "APPROVED"
+  );
+
+  // Generate all leave dates (only for approved leaves)
+  const allLeaveDates = approvedLeaveRequests.flatMap((request) => {
     const dates = getDatesInRange(request.startDate, request.endDate);
     return dates.map((date) => ({
       date,
@@ -53,7 +58,7 @@ const Calendar = () => {
     const currentMonthStart = new Date(date.getFullYear(), date.getMonth(), 1);
     const currentMonthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     
-    return (leaveRequests?.data.content || []).filter((request) => {
+    return approvedLeaveRequests.filter((request) => {
       const startDate = parseISO(request.startDate);
       const endDate = parseISO(request.endDate);
       
@@ -63,7 +68,7 @@ const Calendar = () => {
     });
   };
 
-  // Classname generator for leave types
+  // Classname generator for leave types, with color for compassionate leave
   const getLeaveDayClassName = (date: Date): string => {
     const leaveInfo = getLeaveInfo(date);
     if (!leaveInfo) return "";
@@ -77,6 +82,8 @@ const Calendar = () => {
         return "bg-pink-500/20 text-pink-900 hover:bg-pink-500/30";
       case LeaveType.PATERNITY:
         return "bg-emerald-500/20 text-emerald-900 hover:bg-emerald-500/30";
+      case LeaveType.BEREAVEMENT:
+        return "bg-cyan-500/20 text-cyan-900 hover:bg-cyan-500/30";
       default:
         return "";
     }

@@ -1,134 +1,103 @@
-import Dashboard from '@/pages/Dashboard';
-import LeaveRequest from '@/pages/LeaveRequest';
-import MyLeaves from '@/pages/MyLeaves';
+
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import AdminDashboard from '@/pages/AdminDashboard';
 import Calendar from '@/pages/Calendar';
-import Profile from '@/pages/Profile';
-import Settings from '@/pages/Settings';
-import NotFound from '@/pages/NotFound';
+import Dashboard from '@/pages/Dashboard';
+import Index from '@/pages/Index';
 import LeaveDetails from '@/pages/LeaveDetails';
-import SupervisorDashboard from '@/pages/SupervisorDashboard';
+import LeaveRequest from '@/pages/LeaveRequest';
 import Login from '@/pages/Login';
 import Logout from '@/pages/Logout';
+import MyLeaves from '@/pages/MyLeaves';
+import NotFound from '@/pages/NotFound';
+import Profile from '@/pages/Profile';
+import Settings from '@/pages/Settings';
 import SignUp from '@/pages/SignUp';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import SupervisorDashboard from '@/pages/SupervisorDashboard';
+import AuthCallback from '@/pages/AuthCallback';
 
-interface RouteConfig {
+export interface Route {
   path: string;
-  component: React.ComponentType<any>;
-  protection?: {
-    enabled: boolean;
-    roles?: string[];
-  };
+  element: React.ReactNode;
 }
 
-/**
- * Routes configuration that mimics Next.js Pages Router
- * In a real Next.js app, this would be automatically generated from the file system
- */
-export const routes: RouteConfig[] = [
+export const routes: Route[] = [
+  { path: '/', element: <Index /> },
+  { path: '/login', element: <Login /> },
+  { path: '/logout', element: <Logout /> },
+  { path: '/signup', element: <SignUp /> },
+  { path: '/auth/callback', element: <AuthCallback /> },
   {
-    path: '/',
-    component: () => (
+    path: '/dashboard',
+    element: (
       <ProtectedRoute>
         <Dashboard />
       </ProtectedRoute>
     ),
-    protection: {
-      enabled: true,
-    }
   },
   {
-    path: '/request',
-    component: () => (
-      <ProtectedRoute>
-        <LeaveRequest />
+    path: '/admin',
+    element: (
+      <ProtectedRoute requiredRoles={['ROLE_ADMIN']}>
+        <AdminDashboard />
       </ProtectedRoute>
     ),
-    protection: {
-      enabled: true,
-    }
   },
   {
-    path: '/my-leaves',
-    component: () => (
-      <ProtectedRoute>
-        <MyLeaves />
-      </ProtectedRoute>
-    ),
-    protection: {
-      enabled: true,
-    }
-  },
-  {
-    path: '/leave-details/:id',
-    component: () => (
-      <ProtectedRoute>
-        <LeaveDetails />
-      </ProtectedRoute>
-    ),
-    protection: {
-      enabled: true,
-    }
-  },
-  {
-    path: '/supervisor-dashboard',
-    component: () => (
-      <ProtectedRoute requiredRoles={['supervisor', 'admin']}>
+    path: '/supervisor',
+    element: (
+      <ProtectedRoute requiredRoles={['ROLE_SUPERVISOR', 'ROLE_ADMIN']}>
         <SupervisorDashboard />
       </ProtectedRoute>
     ),
-    protection: {
-      enabled: true,
-      roles: ['supervisor', 'admin'],
-    }
   },
   {
     path: '/calendar',
-    component: () => (
+    element: (
       <ProtectedRoute>
         <Calendar />
       </ProtectedRoute>
     ),
-    protection: {
-      enabled: true,
-    }
+  },
+  {
+    path: '/my-leaves',
+    element: (
+      <ProtectedRoute>
+        <MyLeaves />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/leave-request',
+    element: (
+      <ProtectedRoute>
+        <LeaveRequest />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/leave/:id',
+    element: (
+      <ProtectedRoute>
+        <LeaveDetails />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/profile',
-    component: () => (
+    element: (
       <ProtectedRoute>
         <Profile />
       </ProtectedRoute>
     ),
-    protection: {
-      enabled: true,
-    }
   },
   {
     path: '/settings',
-    component: () => (
+    element: (
       <ProtectedRoute>
         <Settings />
       </ProtectedRoute>
     ),
-    protection: {
-      enabled: true,
-    }
   },
-  {
-    path: '/login',
-    component: Login,
-  },
-  {
-    path: '/signup',
-    component: SignUp,
-  },
-  {
-    path: '/logout',
-    component: Logout,
-  },
-  {
-    path: '*',
-    component: NotFound,
-  },
+  { path: '*', element: <NotFound /> },
 ];

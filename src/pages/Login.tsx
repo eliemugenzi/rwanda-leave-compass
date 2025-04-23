@@ -4,9 +4,16 @@ import { Link } from '@/pages-router/navigation';
 import { Logo } from '@/components/layout/Logo';
 import { LoginFormFields } from '@/components/auth/LoginFormFields';
 import { useLoginForm } from '@/hooks/useLoginForm';
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { Microsoft } from 'lucide-react';
 
 const Login = () => {
   const { form, isLoading, onSubmit } = useLoginForm();
+
+  const handleMicrosoftLogin = () => {
+    window.location.href = '/oauth2/authorization/azure-ad';
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/30">
@@ -16,11 +23,33 @@ const Login = () => {
           <CardDescription>Sign in to access your leave management dashboard</CardDescription>
         </CardHeader>
         <CardContent>
-          <LoginFormFields
-            form={form}
-            isLoading={isLoading}
-            onSubmit={onSubmit}
-          />
+          <div className="space-y-4">
+            <Button 
+              variant="outline" 
+              className="w-full" 
+              onClick={handleMicrosoftLogin}
+            >
+              <Microsoft className="mr-2 h-4 w-4" />
+              Sign in with Microsoft
+            </Button>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <Separator />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+            
+            <LoginFormFields
+              form={form}
+              isLoading={isLoading}
+              onSubmit={onSubmit}
+            />
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-2 text-center text-sm text-muted-foreground">
           <p>Don't have an account?</p>

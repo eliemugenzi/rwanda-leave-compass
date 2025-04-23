@@ -84,6 +84,14 @@ export const routes: Route[] = [
     ),
   },
   {
+    path: '/leave-details/:id',
+    element: (
+      <ProtectedRoute>
+        <LeaveDetails />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/profile',
     element: (
       <ProtectedRoute>

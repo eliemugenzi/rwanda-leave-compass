@@ -6,7 +6,7 @@ import { LoginFormFields } from '@/components/auth/LoginFormFields';
 import { useLoginForm } from '@/hooks/useLoginForm';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Globe } from 'lucide-react';
+import { MicrosoftIcon } from '@/components/icons/MicrosoftIcon';
 import { BASE_URL } from '@/services/api/config';
 
 const Login = () => {
@@ -37,7 +37,7 @@ const Login = () => {
               className="w-full" 
               onClick={handleMicrosoftLogin}
             >
-              <Globe className="mr-2 h-4 w-4" />
+              <MicrosoftIcon className="mr-2 h-4 w-4" />
               Sign in with Microsoft
             </Button>
             

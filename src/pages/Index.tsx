@@ -11,7 +11,7 @@ const Index = () => {
     <div className="min-h-screen flex items-center justify-center bg-muted/30">
       <div className="text-center max-w-2xl px-4">
         <h1 className="text-4xl font-bold mb-4 text-foreground">
-          Rwanda Leave Management System
+          Time Away
         </h1>
         <p className="text-xl text-muted-foreground mb-8">
           Streamline your time off requests, track leave balances, and manage 

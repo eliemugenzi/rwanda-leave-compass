@@ -1,7 +1,6 @@
-
 import { Navigate, RouteObject } from "react-router-dom";
 import { lazy } from "react";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 // Pages
 const Index = lazy(() => import("@/pages/Index"));

@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Loader } from "lucide-react";
-import { userProfile } from "@/data/temporaryMockData";
+import { useAuth } from "@/context/AuthContext";
 import { DatePickerField } from "./form-fields/DatePickerField";
 import { LeaveTypeField } from "./form-fields/LeaveTypeField";
 import { ReasonField } from "./form-fields/ReasonField";
@@ -19,6 +20,7 @@ interface LeaveRequestFormProps {
 
 export function LeaveRequestForm({ onSubmit }: LeaveRequestFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
   const form = useForm<LeaveRequestFormValues>({
     resolver: zodResolver(leaveRequestSchema),
     defaultValues: {
@@ -97,7 +99,7 @@ export function LeaveRequestForm({ onSubmit }: LeaveRequestFormProps) {
         
         <div className="mt-4">
           <p className="text-sm text-muted-foreground mb-2">
-            Your request will be sent to: <span className="font-medium">{userProfile.supervisorName || "Your supervisor"}</span>
+            Your request will be sent to your supervisor for review.
           </p>
         </div>
         

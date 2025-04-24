@@ -1,4 +1,3 @@
-
 // src/components/layout/AppSidebar.tsx
 import {
   Home,
@@ -115,24 +114,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
             </Link>
           </li>
           
-          {/* Show admin/HR specific menu options */}
-          {isAdminOrHR && (
-            <li>
-              <Link
-                href="/admin-dashboard"
-                className={({ isActive }) =>
-                  `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
-                    isActive ? "bg-gray-200 font-medium" : ""
-                  }`
-                }
-              >
-                <Users className="w-5 h-5 mr-2" />
-                <span className={`${isCollapsed ? "hidden" : ""}`}>
-                  Manage Leaves
-                </span>
-              </Link>
-            </li>
-          )}
+          {/* Removed "Manage Leaves" menu item */}
+          
           {/* Keep supervisor specific menu */}
           {user?.role === "supervisor" && (
             <li>

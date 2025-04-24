@@ -1,3 +1,4 @@
+
 // src/components/layout/AppSidebar.tsx
 import {
   Home,
@@ -8,7 +9,7 @@ import {
   FileText,
   LogOut,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Link } from "@/pages-router/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 interface AppSidebarProps {
@@ -37,8 +38,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
       <nav className="flex-1 py-4">
         <ul>
           <li>
-            <NavLink
-              to="/dashboard"
+            <Link
+              href="/dashboard"
               className={({ isActive }) =>
                 `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
                   isActive ? "bg-gray-200 font-medium" : ""
@@ -49,11 +50,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
               <span className={`${isCollapsed ? "hidden" : ""}`}>
                 Dashboard
               </span>
-            </NavLink>
+            </Link>
           </li>
           <li>
-            <NavLink
-              to="/leave-request"
+            <Link
+              href="/leave-request"
               className={({ isActive }) =>
                 `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
                   isActive ? "bg-gray-200 font-medium" : ""
@@ -64,11 +65,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
               <span className={`${isCollapsed ? "hidden" : ""}`}>
                 Request Leave
               </span>
-            </NavLink>
+            </Link>
           </li>
           <li>
-            <NavLink
-              to="/my-leaves"
+            <Link
+              href="/my-leaves"
               className={({ isActive }) =>
                 `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
                   isActive ? "bg-gray-200 font-medium" : ""
@@ -79,12 +80,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
               <span className={`${isCollapsed ? "hidden" : ""}`}>
                 My Leaves
               </span>
-            </NavLink>
+            </Link>
           </li>
           {user?.role === "supervisor" && (
             <li>
-              <NavLink
-                to="/supervisor-dashboard"
+              <Link
+                href="/supervisor-dashboard"
                 className={({ isActive }) =>
                   `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
                     isActive ? "bg-gray-200 font-medium" : ""
@@ -95,13 +96,13 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
                 <span className={`${isCollapsed ? "hidden" : ""}`}>
                   Supervisor Dashboard
                 </span>
-              </NavLink>
+              </Link>
             </li>
           )}
           {user?.role === "admin" && (
             <li>
-              <NavLink
-                to="/admin-dashboard"
+              <Link
+                href="/admin-dashboard"
                 className={({ isActive }) =>
                   `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
                     isActive ? "bg-gray-200 font-medium" : ""
@@ -112,12 +113,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
                 <span className={`${isCollapsed ? "hidden" : ""}`}>
                   Admin Dashboard
                 </span>
-              </NavLink>
+              </Link>
             </li>
           )}
           <li>
-            <NavLink
-              to="/profile"
+            <Link
+              href="/profile"
               className={({ isActive }) =>
                 `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
                   isActive ? "bg-gray-200 font-medium" : ""
@@ -128,11 +129,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
               <span className={`${isCollapsed ? "hidden" : ""}`}>
                 Profile
               </span>
-            </NavLink>
+            </Link>
           </li>
           <li>
-            <NavLink
-              to="/settings"
+            <Link
+              href="/settings"
               className={({ isActive }) =>
                 `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
                   isActive ? "bg-gray-200 font-medium" : ""
@@ -143,7 +144,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
               <span className={`${isCollapsed ? "hidden" : ""}`}>
                 Settings
               </span>
-            </NavLink>
+            </Link>
           </li>
         </ul>
       </nav>

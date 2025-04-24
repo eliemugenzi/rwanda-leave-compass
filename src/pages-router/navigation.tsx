@@ -102,22 +102,29 @@ export const useRouter = (): RouterContextType => {
 };
 
 // Link component
-export const Link: React.FC<{
+interface LinkProps {
   href: string;
-  className?: string;
+  className?: string | ((props: { isActive: boolean }) => string);
   children: React.ReactNode;
   onClick?: (e: React.MouseEvent) => void;
-}> = ({ href, className, children, onClick }) => {
-  const router = useRouter();
+}
 
+export const Link: React.FC<LinkProps> = ({ href, className, children, onClick }) => {
+  const router = useRouter();
+  const isActive = router.pathname === href;
+  
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (onClick) onClick(e);
     router.push(href);
   };
+  
+  const resolvedClassName = typeof className === 'function' 
+    ? className({ isActive }) 
+    : className;
 
   return (
-    <a href={href} className={className} onClick={handleClick}>
+    <a href={href} className={resolvedClassName} onClick={handleClick}>
       {children}
     </a>
   );

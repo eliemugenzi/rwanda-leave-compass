@@ -1,4 +1,5 @@
 
+import React from "react";
 import { RouteObject } from "react-router-dom";
 import { lazy } from "react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";

@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from '@/pages-router/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { loginUser } from '@/services/api';
 import { loginSchema, type LoginFormData } from '@/validation/login.schema';
 
 export const useLoginForm = () => {
@@ -33,7 +32,7 @@ export const useLoginForm = () => {
           title: 'Login successful',
           description: 'Welcome back!',
         });
-        router.push('/');
+        router.push('/dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);

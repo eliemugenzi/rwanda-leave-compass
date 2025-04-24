@@ -23,6 +23,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
     logout();
   };
 
+  // Check if user is admin or HR to determine sidebar title
+  const isAdminOrHR = user?.role === 'admin' || 
+                     user?.role === 'ROLE_ADMIN' || 
+                     user?.role === 'hr' || 
+                     user?.role === 'ROLE_HR';
+
   return (
     <div
       className={`flex flex-col h-full bg-gray-100 border-r border-gray-200 ${
@@ -31,7 +37,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
     >
       <div className="flex items-center justify-center h-16 border-b border-gray-200 shrink-0">
         <span className={`font-bold text-xl ${isCollapsed ? "hidden" : ""}`}>
-          {user?.role === 'admin' ? 'Admin Panel' : 'Employee Portal'}
+          {isAdminOrHR ? 'Admin Panel' : 'Employee Portal'}
         </span>
         {isCollapsed && <Home className="w-6 h-6" />}
       </div>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { format, isBefore, isWithinInterval, parseISO } from "date-fns";
@@ -12,6 +11,8 @@ import { addDays } from "date-fns";
 import { Loader } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { exportToCSV } from "@/utils/exportUtils";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
@@ -124,6 +125,21 @@ const Calendar = () => {
     return Array.from(new Set(matching.map(req => req.employeeName || "").filter(Boolean)));
   };
 
+  const handleExport = () => {
+    if (leaveRequests?.data.content) {
+      const fileName = selectedDepartment === "all" 
+        ? `all-departments-leave-requests-${format(new Date(), 'yyyy-MM-dd')}.csv`
+        : `${departments?.data.find(d => d.id === selectedDepartment)?.name}-leave-requests-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      
+      const exportData = leaveRequests.data.content.map(request => ({
+        ...request,
+        departmentName: departments?.data.find(d => d.id === request.departmentId)?.name
+      }));
+      
+      exportToCSV(exportData, fileName);
+    }
+  };
+
   if (isLeavesLoading || isDepartmentsLoading) {
     return (
       <AppLayout>
@@ -145,23 +161,32 @@ const Calendar = () => {
       </div>
 
       {isAdminOrHR && departments?.data && (
-        <div className="mb-6 max-w-xs">
-          <Select
-            value={selectedDepartment}
-            onValueChange={setSelectedDepartment}
+        <div className="mb-6 flex items-center gap-4">
+          <div className="max-w-xs flex-1">
+            <Select
+              value={selectedDepartment}
+              onValueChange={setSelectedDepartment}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by department" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
+                {departments.data.map((dept) => (
+                  <SelectItem key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button 
+            variant="outline"
+            onClick={handleExport}
+            disabled={!leaveRequests?.data.content?.length}
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by department" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              {departments.data.map((dept) => (
-                <SelectItem key={dept.id} value={dept.id}>
-                  {dept.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            Export to CSV
+          </Button>
         </div>
       )}
 

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -64,19 +63,8 @@ export const LeaveStatisticsChart = () => {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={transformedData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="name" 
-                height={50}
-              >
-                <Label
-                  value="Months"
-                  position="bottom"
-                  offset={0}
-                />
-              </XAxis>
-              <YAxis 
-                width={80}
-              >
+              <XAxis dataKey="name" />
+              <YAxis width={80}>
                 <Label
                   value="Number of Days"
                   angle={-90}
@@ -97,4 +85,3 @@ export const LeaveStatisticsChart = () => {
     </Card>
   );
 };
-

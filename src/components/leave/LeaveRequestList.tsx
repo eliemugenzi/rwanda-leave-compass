@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -67,8 +68,9 @@ export function LeaveRequestList({
     return diffDays;
   };
 
+  // Fix: Update the path to use /leave-details/ instead of /leave/
   const viewLeaveDetails = (id: string) => {
-    router.push(`/leave/${id}`);
+    router.push(`/leave-details/${id}`);
   };
 
   const renderPaginationItems = () => {

@@ -1,9 +1,16 @@
 
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { RouteObject } from "react-router-dom";
-import { lazy } from "react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useRouter } from "./navigation";
+import { Loader } from "lucide-react";
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <Loader className="h-8 w-8 animate-spin text-primary" />
+  </div>
+);
 
 // Custom redirect component that uses our custom router
 const Redirect = ({ to }: { to: string }) => {
@@ -37,29 +44,31 @@ const NotFound = lazy(() => import("@/pages/NotFound"));
 export const routes: RouteObject[] = [
   {
     path: "/",
-    element: <Index />,
+    element: <Suspense fallback={<LoadingFallback />}><Index /></Suspense>,
   },
   {
     path: "/login",
-    element: <Login />,
+    element: <Suspense fallback={<LoadingFallback />}><Login /></Suspense>,
   },
   {
     path: "/signup",
-    element: <SignUp />,
+    element: <Suspense fallback={<LoadingFallback />}><SignUp /></Suspense>,
   },
   {
     path: "/logout",
-    element: <Logout />,
+    element: <Suspense fallback={<LoadingFallback />}><Logout /></Suspense>,
   },
   {
     path: "/auth-callback",
-    element: <AuthCallback />,
+    element: <Suspense fallback={<LoadingFallback />}><AuthCallback /></Suspense>,
   },
   {
     path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <Dashboard />
+        <Suspense fallback={<LoadingFallback />}>
+          <Dashboard />
+        </Suspense>
       </ProtectedRoute>
     ),
   },
@@ -67,7 +76,9 @@ export const routes: RouteObject[] = [
     path: "/leave-request",
     element: (
       <ProtectedRoute>
-        <LeaveRequest />
+        <Suspense fallback={<LoadingFallback />}>
+          <LeaveRequest />
+        </Suspense>
       </ProtectedRoute>
     ),
   },
@@ -80,7 +91,9 @@ export const routes: RouteObject[] = [
     path: "/my-leaves",
     element: (
       <ProtectedRoute>
-        <MyLeaves />
+        <Suspense fallback={<LoadingFallback />}>
+          <MyLeaves />
+        </Suspense>
       </ProtectedRoute>
     ),
   },
@@ -88,7 +101,9 @@ export const routes: RouteObject[] = [
     path: "/calendar",
     element: (
       <ProtectedRoute>
-        <Calendar />
+        <Suspense fallback={<LoadingFallback />}>
+          <Calendar />
+        </Suspense>
       </ProtectedRoute>
     ),
   },
@@ -96,7 +111,9 @@ export const routes: RouteObject[] = [
     path: "/leave-details/:id",
     element: (
       <ProtectedRoute>
-        <LeaveDetails />
+        <Suspense fallback={<LoadingFallback />}>
+          <LeaveDetails />
+        </Suspense>
       </ProtectedRoute>
     ),
   },
@@ -104,7 +121,9 @@ export const routes: RouteObject[] = [
     path: "/profile",
     element: (
       <ProtectedRoute>
-        <Profile />
+        <Suspense fallback={<LoadingFallback />}>
+          <Profile />
+        </Suspense>
       </ProtectedRoute>
     ),
   },
@@ -112,7 +131,9 @@ export const routes: RouteObject[] = [
     path: "/settings",
     element: (
       <ProtectedRoute>
-        <Settings />
+        <Suspense fallback={<LoadingFallback />}>
+          <Settings />
+        </Suspense>
       </ProtectedRoute>
     ),
   },
@@ -120,7 +141,9 @@ export const routes: RouteObject[] = [
     path: "/supervisor-dashboard",
     element: (
       <ProtectedRoute>
-        <SupervisorDashboard />
+        <Suspense fallback={<LoadingFallback />}>
+          <SupervisorDashboard />
+        </Suspense>
       </ProtectedRoute>
     ),
   },
@@ -128,12 +151,14 @@ export const routes: RouteObject[] = [
     path: "/admin-dashboard",
     element: (
       <ProtectedRoute>
-        <AdminDashboard />
+        <Suspense fallback={<LoadingFallback />}>
+          <AdminDashboard />
+        </Suspense>
       </ProtectedRoute>
     ),
   },
   {
     path: "*",
-    element: <NotFound />,
+    element: <Suspense fallback={<LoadingFallback />}><NotFound /></Suspense>,
   },
 ];

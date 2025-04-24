@@ -22,18 +22,15 @@ const Calendar = () => {
     queryFn: () => getDepartments(),
   });
   
+  // Updated query to include selectedDepartment in fetchFn
   const { data: leaveRequests, isLoading: isLeavesLoading } = useQuery({
     queryKey: ['leaveRequests', 'calendar', selectedDepartment],
-    queryFn: () => fetchAllLeaveRequests(undefined, 0, 100),
+    queryFn: () => fetchAllLeaveRequests(undefined, 0, 100, selectedDepartment !== "all" ? selectedDepartment : undefined),
   });
 
-  // Only include APPROVED leaves and filter by department if selected
+  // Only include APPROVED leaves
   const approvedLeaveRequests = (leaveRequests?.data.content || []).filter(
-    (request) => {
-      const isApproved = request.status === "APPROVED";
-      if (selectedDepartment === "all") return isApproved;
-      return isApproved && request.departmentId === selectedDepartment;
-    }
+    (request) => request.status === "APPROVED"
   );
 
   console.log("Selected department:", selectedDepartment);

@@ -1,4 +1,3 @@
-
 import { BASE_URL, fetchWithAuth } from './config';
 import { 
   LeaveRequestResponse, 
@@ -30,10 +29,18 @@ export interface MonthlyStatisticsResponse {
   data: MonthlyStatistic[];
 }
 
-export async function fetchAllLeaveRequests(status?: string, page: number = 0, size: number = 10): Promise<LeaveRequestResponse> {
+export async function fetchAllLeaveRequests(
+  status?: string, 
+  page: number = 0, 
+  size: number = 10,
+  departmentId?: string
+): Promise<LeaveRequestResponse> {
   const url = new URL(`${BASE_URL}/leave-requests`);
   if (status) {
     url.searchParams.append('status', status);
+  }
+  if (departmentId) {
+    url.searchParams.append('departmentId', departmentId);
   }
   url.searchParams.append('page', page.toString());
   url.searchParams.append('size', size.toString());

@@ -2,9 +2,15 @@
 import { DayProps } from "react-day-picker";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { LeaveEmployeeListPopover } from "./LeaveEmployeeListPopover";
-import { useAuth } from "@/context/AuthContext";
+import { getRwandaHolidays } from "@/utils/rwandaHolidays";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface CalendarViewProps {
   date: Date;
@@ -23,6 +29,17 @@ export const CalendarView = ({
   getEmployeesOnLeave,
   showEmployeePopover = false
 }: CalendarViewProps) => {
+  // Get holidays for current and next year
+  const holidays = getRwandaHolidays();
+
+  const isHoliday = (date: Date) => {
+    return holidays.some(holiday => isSameDay(holiday.date, date));
+  };
+
+  const getHolidayInfo = (date: Date) => {
+    return holidays.find(holiday => isSameDay(holiday.date, date));
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -42,10 +59,18 @@ export const CalendarView = ({
           }}
           modifiers={{
             booked: (date) => !!getLeaveInfo(date),
+            holiday: (date) => isHoliday(date),
+          }}
+          modifiersStyles={{
+            holiday: {
+              color: "rgb(239 68 68)", // text-red-500
+              fontWeight: "bold"
+            }
           }}
           components={{
             Day: ({ date: dayDate, ...props }: DayProps) => {
               const isBooked = !!getLeaveInfo(dayDate);
+              const holidayInfo = getHolidayInfo(dayDate);
               const employees = 
                 showEmployeePopover && getEmployeesOnLeave && isBooked
                   ? getEmployeesOnLeave(dayDate) || []
@@ -63,6 +88,25 @@ export const CalendarView = ({
                   {dayDate.getDate()}
                 </div>
               );
+
+              // If it's a holiday, wrap with tooltip
+              if (holidayInfo) {
+                dayContent = (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        {dayContent}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{holidayInfo.name}</p>
+                        {holidayInfo.description && (
+                          <p className="text-xs text-muted-foreground">{holidayInfo.description}</p>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                );
+              }
 
               if (showEmployeePopover && isBooked && employees.length > 0) {
                 return (

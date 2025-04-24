@@ -49,6 +49,12 @@ export const getRwandaHolidays = (baseYear: number = new Date().getFullYear()): 
       name: "Boxing Day",
       date: new Date(baseYear, 11, 26),
       description: "Boxing Day"
+    },
+    // Adding tomorrow as a holiday for testing purposes
+    {
+      name: "Test Holiday", 
+      date: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1),
+      description: "This is a test holiday to verify highlighting"
     }
   ];
 

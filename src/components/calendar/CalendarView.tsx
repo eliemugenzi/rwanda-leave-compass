@@ -56,22 +56,18 @@ export const CalendarView = ({
           className="rounded-md border w-full"
           modifiersClassNames={{
             selected: "bg-primary text-primary-foreground",
+            holiday: "bg-green-100 text-green-600 font-bold hover:bg-green-200"
           }}
           modifiers={{
             booked: (date) => !!getLeaveInfo(date),
-            holiday: (date) => isHoliday(date),
-          }}
-          modifiersStyles={{
-            holiday: {
-              backgroundColor: "#F2FCE2", // Soft green background
-              color: "rgb(34 197 94)", // Green text for better readability
-              fontWeight: "bold"
-            }
+            holiday: isHoliday
           }}
           components={{
             Day: ({ date: dayDate, ...props }: DayProps) => {
               const isBooked = !!getLeaveInfo(dayDate);
               const holidayInfo = getHolidayInfo(dayDate);
+              const isCurrentDayHoliday = isHoliday(dayDate);
+              
               const employees = 
                 showEmployeePopover && getEmployeesOnLeave && isBooked
                   ? getEmployeesOnLeave(dayDate) || []
@@ -83,7 +79,7 @@ export const CalendarView = ({
               
               let dayContent = (
                 <div
-                  className={`${className} ${isBooked ? getLeaveDayClassName(dayDate) : ''}`}
+                  className={`${className} ${isBooked ? getLeaveDayClassName(dayDate) : ''} ${isCurrentDayHoliday ? 'bg-green-100 text-green-600 font-bold hover:bg-green-200' : ''}`}
                   {...dayProps}
                 >
                   {dayDate.getDate()}
@@ -125,4 +121,3 @@ export const CalendarView = ({
     </Card>
   );
 };
-

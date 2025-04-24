@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { format, isBefore, isWithinInterval, parseISO } from "date-fns";
@@ -14,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
-  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
+  const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
   
   const { data: departments, isLoading: isDepartmentsLoading } = useQuery({
     queryKey: ['departments'],
@@ -30,7 +31,7 @@ const Calendar = () => {
   const approvedLeaveRequests = (leaveRequests?.data.content || []).filter(
     (request) => {
       const isApproved = request.status === "APPROVED";
-      if (!selectedDepartment) return isApproved;
+      if (selectedDepartment === "all") return isApproved;
       return isApproved && request.departmentId === selectedDepartment;
     }
   );
@@ -151,7 +152,7 @@ const Calendar = () => {
               <SelectValue placeholder="Filter by department" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Departments</SelectItem>
+              <SelectItem value="all">All Departments</SelectItem>
               {departments.data.map((dept) => (
                 <SelectItem key={dept.id} value={dept.id}>
                   {dept.name}

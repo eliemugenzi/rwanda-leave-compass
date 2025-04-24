@@ -1,3 +1,4 @@
+
 import { LeaveType } from '@/types/leave';
 
 export interface PaginatedResponse<T> {

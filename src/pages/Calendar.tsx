@@ -36,6 +36,10 @@ const Calendar = () => {
     }
   );
 
+  console.log("Selected department:", selectedDepartment);
+  console.log("Filtered leaves:", approvedLeaveRequests.length);
+  console.log("All leaves:", leaveRequests?.data.content?.length || 0);
+
   // Helper function to get all dates in a date range
   const getDatesInRange = (startDate: string, endDate: string) => {
     const start = parseISO(startDate);
@@ -58,7 +62,8 @@ const Calendar = () => {
       date,
       type: request.type,
       status: request.status,
-      employeeName: request.employeeName
+      employeeName: request.employeeName,
+      departmentId: request.departmentId
     }));
   });
 

@@ -83,12 +83,12 @@ export function LeaveRequestList({
     router.push(`/leave-details/${id}`);
   };
 
-  const handleExport = (format: ExportFormat) => {
+  const handleExport = (exportFormat: ExportFormat) => {
     const filename = department
       ? `${department}-leave-requests-${format(new Date(), 'yyyy-MM-dd')}`
       : `leave-requests-${format(new Date(), 'yyyy-MM-dd')}`;
     
-    exportToFile(requests, filename, format);
+    exportToFile(requests, filename, exportFormat);
   };
 
   const renderPaginationItems = () => {

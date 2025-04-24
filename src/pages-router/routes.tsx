@@ -1,4 +1,3 @@
-
 import React, { lazy, Suspense } from "react";
 import { RouteObject } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -57,10 +56,6 @@ export const routes: RouteObject[] = [
   {
     path: "/logout",
     element: <Suspense fallback={<LoadingFallback />}><Logout /></Suspense>,
-  },
-  {
-    path: "/auth-callback",
-    element: <Suspense fallback={<LoadingFallback />}><AuthCallback /></Suspense>,
   },
   {
     path: "/dashboard",
@@ -156,6 +151,10 @@ export const routes: RouteObject[] = [
         </Suspense>
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "/auth/callback",
+    element: <Suspense fallback={<LoadingFallback />}><AuthCallback /></Suspense>,
   },
   {
     path: "*",

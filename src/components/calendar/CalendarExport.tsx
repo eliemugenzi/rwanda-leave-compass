@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { FileExcel, FileCsv } from "lucide-react";
+import { File, Files } from "lucide-react";
 import { exportToFile } from "@/utils/exportUtils";
 import { format } from "date-fns";
 
@@ -16,7 +16,7 @@ export function CalendarExport({
   selectedDepartment,
   data
 }: CalendarExportProps) {
-  const handleExport = (format: 'csv' | 'excel') => {
+  const handleExport = (exportFormat: 'csv' | 'excel') => {
     if (data) {
       const fileName = selectedDepartment === "all" 
         ? `all-departments-leave-requests-${format(new Date(), 'yyyy-MM-dd')}`
@@ -27,7 +27,7 @@ export function CalendarExport({
         departmentName: departments?.find(d => d.id === request.departmentId)?.name
       }));
       
-      exportToFile(exportData, fileName, format);
+      exportToFile(exportData, fileName, exportFormat);
     }
   };
 
@@ -43,11 +43,11 @@ export function CalendarExport({
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => handleExport('csv')}>
-          <FileCsv className="mr-2 h-4 w-4" />
+          <Files className="mr-2 h-4 w-4" />
           CSV
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleExport('excel')}>
-          <FileExcel className="mr-2 h-4 w-4" />
+          <File className="mr-2 h-4 w-4" />
           Excel
         </DropdownMenuItem>
       </DropdownMenuContent>

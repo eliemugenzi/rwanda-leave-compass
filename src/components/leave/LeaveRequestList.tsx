@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -8,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Eye, File, Files } from "lucide-react";
 import { useRouter } from "@/pages-router/navigation";
 import { LeaveRequest } from "@/services/api";
 import { 
@@ -25,9 +26,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { exportToFile, ExportFormat, ExportFormatIcon } from "@/utils/exportUtils";
+import { exportToFile, ExportFormat } from "@/utils/exportUtils";
 import { format } from "date-fns";
-import { FileCsv, FileExcel } from "lucide-react";
 
 interface LeaveRequestListProps {
   requests: LeaveRequest[];
@@ -128,11 +128,11 @@ export function LeaveRequestList({
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem onClick={() => handleExport('csv')}>
-                <FileCsv className="mr-2 h-4 w-4" />
+                <Files className="mr-2 h-4 w-4" />
                 CSV
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleExport('excel')}>
-                <FileExcel className="mr-2 h-4 w-4" />
+                <File className="mr-2 h-4 w-4" />
                 Excel
               </DropdownMenuItem>
             </DropdownMenuContent>

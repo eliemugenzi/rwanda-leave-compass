@@ -1,11 +1,11 @@
 
-import { FileExcel, FileCsv } from "lucide-react";
+import { File, Files } from "lucide-react";
 
 export type ExportFormat = 'csv' | 'excel';
 
 export const ExportFormatIcon = {
-  csv: FileCsv,
-  excel: FileExcel,
+  csv: Files,
+  excel: File,
 };
 
 export const exportToFile = (data: any[], filename: string, format: ExportFormat = 'csv') => {

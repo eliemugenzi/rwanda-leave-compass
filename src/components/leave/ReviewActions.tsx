@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -7,6 +6,7 @@ import { useRouter } from "@/pages-router/navigation";
 import { useState } from "react";
 import { updateLeaveRequestStatus } from "@/services/api";
 import { LeaveRequest } from "@/types/leave";
+import { Loader } from "lucide-react";
 
 interface ReviewActionsProps {
   leaveRequest: LeaveRequest;
@@ -108,14 +108,28 @@ export const ReviewActions = ({
           disabled={isSubmitting}
           onClick={() => setShowRejectConfirm(true)}
         >
-          Reject Request
+          {isSubmitting ? (
+            <>
+              <Loader className="mr-2 h-4 w-4 animate-spin" />
+              Rejecting...
+            </>
+          ) : (
+            'Reject Request'
+          )}
         </Button>
         <Button 
           variant="default"
           disabled={isSubmitting}
           onClick={() => setShowApproveConfirm(true)}
         >
-          Approve Request
+          {isSubmitting ? (
+            <>
+              <Loader className="mr-2 h-4 w-4 animate-spin" />
+              Approving...
+            </>
+          ) : (
+            'Approve Request'
+          )}
         </Button>
       </div>
       {/* Approve Confirmation Dialog */}

@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { LeaveRequestFormValues } from "@/validation/leave-request.schema";
 import { useState } from "react";
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+
 interface SupportingDocumentFieldProps {
   form: UseFormReturn<LeaveRequestFormValues>;
 }
@@ -35,8 +37,16 @@ export function SupportingDocumentField({ form }: SupportingDocumentFieldProps) 
                 onChange={(event) => {
                   const file = event.target.files?.[0];
                   if (file) {
-                    onChange(file);
-                    setFileName(file.name);
+                    if (file.size > MAX_FILE_SIZE) {
+                      form.setError("supportingDocument", {
+                        message: "File size must not exceed 5MB"
+                      });
+                      setFileName("");
+                    } else {
+                      onChange(file);
+                      setFileName(file.name);
+                      form.clearErrors("supportingDocument");
+                    }
                   }
                 }}
                 className="cursor-pointer"
@@ -55,4 +65,3 @@ export function SupportingDocumentField({ form }: SupportingDocumentFieldProps) 
     />
   );
 }
-

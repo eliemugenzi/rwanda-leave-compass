@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
+import { Loader } from "lucide-react";
 import { userProfile } from "@/data/temporaryMockData";
 import { DatePickerField } from "./form-fields/DatePickerField";
 import { LeaveTypeField } from "./form-fields/LeaveTypeField";
@@ -14,10 +14,11 @@ import { leaveRequestSchema, LeaveRequestFormValues } from "@/validation/leave-r
 import { format, isEqual } from "date-fns";
 
 interface LeaveRequestFormProps {
-  onSubmit: (values: LeaveRequestFormValues) => void;
+  onSubmit: (values: LeaveRequestFormValues) => Promise<void>;
 }
 
 export function LeaveRequestForm({ onSubmit }: LeaveRequestFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<LeaveRequestFormValues>({
     resolver: zodResolver(leaveRequestSchema),
     defaultValues: {
@@ -61,12 +62,17 @@ export function LeaveRequestForm({ onSubmit }: LeaveRequestFormProps) {
     }
   }, [watchStartDate, watchEndDate, form]);
 
-  const handleSubmit = (values: LeaveRequestFormValues) => {
-    onSubmit(values);
-    form.reset();
-    setStartDate(undefined);
-    setEndDate(undefined);
-    setIsSameDay(false);
+  const handleSubmit = async (values: LeaveRequestFormValues) => {
+    try {
+      setIsSubmitting(true);
+      await onSubmit(values);
+      form.reset();
+      setStartDate(undefined);
+      setEndDate(undefined);
+      setIsSameDay(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -95,7 +101,16 @@ export function LeaveRequestForm({ onSubmit }: LeaveRequestFormProps) {
           </p>
         </div>
         
-        <Button type="submit">Submit Leave Request</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Loader className="mr-2 h-4 w-4 animate-spin" />
+              Submitting...
+            </>
+          ) : (
+            'Submit Leave Request'
+          )}
+        </Button>
       </form>
     </Form>
   );

@@ -14,6 +14,14 @@ export const leaveRequestSchema = z.object({
   reason: z.string().min(5, {
     message: "Reason must be at least 5 characters",
   }),
+  durationType: z.enum(["FULL_DAY", "HALF_DAY"]).optional(),
+  supportingDocument: z.instanceof(File).optional(),
 });
 
 export type LeaveRequestFormValues = z.infer<typeof leaveRequestSchema>;
+
+export enum DurationType {
+  FULL_DAY = "FULL_DAY",
+  HALF_DAY = "HALF_DAY"
+}
+

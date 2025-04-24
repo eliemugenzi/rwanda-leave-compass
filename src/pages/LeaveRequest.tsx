@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { toast } from "@/hooks/use-toast";
 import { LeaveRequestForm } from "@/components/leave/LeaveRequestForm";
@@ -14,10 +15,12 @@ const LeaveRequest = () => {
         type: values.leaveType as LeaveType,
         startDate: format(values.startDate, 'yyyy-MM-dd'),
         endDate: format(values.endDate, 'yyyy-MM-dd'),
-        reason: values.reason
+        reason: values.reason,
+        durationType: values.durationType
       };
 
-      await createLeaveRequest(payload);
+      // Handle the file upload separately
+      await createLeaveRequest(payload, values.supportingDocument);
       
       toast({
         title: "Leave request submitted",

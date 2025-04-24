@@ -6,11 +6,18 @@ export const formatDate = (dateString: string) => {
   return format(new Date(dateString), "MMMM dd, yyyy");
 };
 
-export const calculateDuration = (startDate: string, endDate: string) => {
+export const calculateDuration = (startDate: string, endDate: string, durationType?: string) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
   const diffTime = Math.abs(end.getTime() - start.getTime());
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  
+  // If it's the same day and half day is selected
+  if (days === 1 && durationType === "HALF_DAY") {
+    return 0.5;
+  }
+  
+  return days;
 };
 
 export const getStatusBadgeStyle = (status: string) => {

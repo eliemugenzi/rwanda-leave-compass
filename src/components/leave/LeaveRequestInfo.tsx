@@ -1,5 +1,5 @@
 
-import { Calendar, Clock, FileText } from "lucide-react";
+import { Calendar, Clock, FileText, FileUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate, calculateDuration, getStatusBadgeStyle } from "@/utils/leaveRequestUtils";
@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { ReviewedComment } from "./ReviewedComment";
 import { RejectionReason } from "./RejectionReason";
 import { ReviewActions } from "./ReviewActions";
+import { DocumentPreview } from "./DocumentPreview";
 
 interface LeaveRequestInfoProps {
   leaveRequest: LeaveRequest;
@@ -25,6 +26,9 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
   const approverName = (leaveRequest as any).approverName;
   const supervisorName = leaveRequest.supervisorName;
   const reviewedAt = leaveRequest.reviewedAt;
+
+  // Supporting document information
+  const hasDocument = !!(leaveRequest.supportingDocumentUrl && leaveRequest.supportingDocumentName);
 
   return (
     <Card>
@@ -56,6 +60,11 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
                 <p className="text-muted-foreground">
                   {formatDate(leaveRequest.startDate)} - {formatDate(leaveRequest.endDate)}
                 </p>
+                {leaveRequest.durationType && formatDate(leaveRequest.startDate) === formatDate(leaveRequest.endDate) && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Duration: {leaveRequest.durationType === 'HALF_DAY' ? 'Half Day' : 'Full Day'}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex items-start">
@@ -63,10 +72,23 @@ export const LeaveRequestInfo = ({ leaveRequest, isAdminOrHR, isSupervisor }: Le
               <div>
                 <p className="font-medium">Duration</p>
                 <p className="text-muted-foreground">
-                  {calculateDuration(leaveRequest.startDate, leaveRequest.endDate)} days
+                  {calculateDuration(leaveRequest.startDate, leaveRequest.endDate, leaveRequest.durationType)} days
                 </p>
               </div>
             </div>
+            {hasDocument && (
+              <div className="flex items-start">
+                <FileUp className="h-5 w-5 mr-2 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Supporting Document</p>
+                  <DocumentPreview 
+                    documentUrl={leaveRequest.supportingDocumentUrl!}
+                    documentName={leaveRequest.supportingDocumentName!}
+                    isAdminOrHR={isAdminOrHR || isSupervisor}
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <div className="space-y-4">
             <div className="flex items-start">

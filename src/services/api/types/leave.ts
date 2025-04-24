@@ -1,3 +1,4 @@
+
 import { LeaveType } from '@/types/leave';
 
 export interface PaginatedResponse<T> {
@@ -39,6 +40,9 @@ export interface LeaveRequest {
   reviewedAt?: string;
   approverComment?: string; // for admin/hr
   approverName?: string;    // for admin/hr
+  supportingDocumentUrl?: string;
+  supportingDocumentName?: string;
+  durationType?: "FULL_DAY" | "HALF_DAY";
 }
 
 export interface CreateLeaveRequestPayload {
@@ -46,6 +50,7 @@ export interface CreateLeaveRequestPayload {
   startDate: string;
   endDate: string;
   reason: string;
+  durationType?: "FULL_DAY" | "HALF_DAY";
 }
 
 export interface CreateLeaveRequestResponse {

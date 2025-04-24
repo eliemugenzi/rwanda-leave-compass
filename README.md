@@ -38,12 +38,12 @@ This project is built with:
 
 1. Clone the repository:
 ```sh
-git clone <YOUR_REPOSITORY_URL>
+git clone https://github.com/eliemugenzi/rwanda-leave-compass.git time-away-frontend
 ```
 
 2. Navigate to the project directory:
 ```sh
-cd time-away
+cd time-away-frontend
 ```
 
 3. Install dependencies:
@@ -122,8 +122,60 @@ You can connect a custom domain through the Project Settings in Lovable. Navigat
 
 ## License
 
-[Specify your license here]
+MIT
 
 ## Contact
 
-[Your contact information]
+[Elie Mugenzi](https://elieweb.dev)
+
+# Time Away Frontend
+
+## Running with Docker
+
+### 1. Pull the Docker Image
+```bash
+docker pull eliemugenzi/timeaway-frontend
+```
+
+### 2. Run the Container
+```bash
+# Run in development mode (to use local backend at http://localhost:8083/api/v1)
+docker run -d \
+  --name timeaway-frontend \
+  -p 7001:7000 \
+  -e NODE_ENV=development \
+  eliemugenzi/timeaway-frontend
+
+# Or run in production mode (to use production backend)
+docker run -d \
+  --name timeaway-frontend \
+  -p 7001:7000 \
+  -e NODE_ENV=production \
+  eliemugenzi/timeaway-frontend
+```
+
+### 3. Access the Application
+Once running, you can access the application at:
+- http://localhost:7001
+
+### Additional Commands
+
+Stop the container:
+```bash
+docker stop timeaway-frontend
+```
+
+Remove the container:
+```bash
+docker rm timeaway-frontend
+```
+
+View container logs:
+```bash
+docker logs timeaway-frontend
+```
+
+Restart the container:
+```bash
+docker restart timeaway-frontend
+```

@@ -56,7 +56,26 @@ npm install
 npm run dev
 ```
 
-#### Option 2: Using Docker
+#### Option 2: Using Docker Compose
+
+1. Start the application:
+```sh
+docker-compose up
+```
+
+2. Access the application at `http://localhost:5000`
+
+To run in detached mode:
+```sh
+docker-compose up -d
+```
+
+To stop the application:
+```sh
+docker-compose down
+```
+
+#### Option 3: Using Docker
 
 1. Build the Docker image:
 ```sh

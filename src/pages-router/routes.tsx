@@ -1,6 +1,20 @@
-import { Navigate, RouteObject } from "react-router-dom";
+
+import { RouteObject } from "react-router-dom";
 import { lazy } from "react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { useRouter } from "./navigation";
+
+// Custom redirect component that uses our custom router
+const Redirect = ({ to }: { to: string }) => {
+  const router = useRouter();
+  
+  // Effect to perform the redirect
+  React.useEffect(() => {
+    router.replace(to);
+  }, [router, to]);
+  
+  return null;
+};
 
 // Pages
 const Index = lazy(() => import("@/pages/Index"));
@@ -57,9 +71,9 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    // Add this redirect route to handle "/request" URL
+    // Replace Navigate with custom Redirect component
     path: "/request",
-    element: <Navigate to="/leave-request" replace />,
+    element: <Redirect to="/leave-request" />,
   },
   {
     path: "/my-leaves",

@@ -1,4 +1,3 @@
-
 # Time Away - Employee Leave Management System
 
 Time Away is a comprehensive employee leave management application that streamlines the process of requesting time off, tracking leave balances, and managing approvals.
@@ -31,8 +30,11 @@ This project is built with:
 ### Prerequisites
 
 - Node.js & npm - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Docker (optional) - [install Docker](https://docs.docker.com/get-docker/)
 
 ### Installation
+
+#### Option 1: Local Development
 
 1. Clone the repository:
 ```sh
@@ -53,6 +55,20 @@ npm install
 ```sh
 npm run dev
 ```
+
+#### Option 2: Using Docker
+
+1. Build the Docker image:
+```sh
+docker build -t time-away .
+```
+
+2. Run the container:
+```sh
+docker run -p 8080:8080 time-away
+```
+
+3. Access the application at `http://localhost:8080`
 
 ## Project Structure
 

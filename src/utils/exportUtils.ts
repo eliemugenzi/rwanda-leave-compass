@@ -1,6 +1,15 @@
 
-export const exportToCSV = (data: any[], filename: string) => {
-  // Convert leave requests to CSV format
+import { FileExcel, FileCsv } from "lucide-react";
+
+export type ExportFormat = 'csv' | 'excel';
+
+export const ExportFormatIcon = {
+  csv: FileCsv,
+  excel: FileExcel,
+};
+
+export const exportToFile = (data: any[], filename: string, format: ExportFormat = 'csv') => {
+  // Convert leave requests to table format
   const headers = [
     'Employee Name',
     'Department',
@@ -23,13 +32,26 @@ export const exportToCSV = (data: any[], filename: string) => {
     item.reason
   ]);
 
-  const csvContent = [
-    headers.join(','),
-    ...rows.map(row => row.join(','))
-  ].join('\n');
+  if (format === 'csv') {
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
 
-  // Create and trigger download
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    downloadFile(csvContent, filename + '.csv', 'text/csv;charset=utf-8;');
+  } else {
+    // For Excel, we'll create a tab-separated values file that Excel can open
+    const tsvContent = [
+      headers.join('\t'),
+      ...rows.map(row => row.join('\t'))
+    ].join('\n');
+
+    downloadFile(tsvContent, filename + '.xls', 'application/vnd.ms-excel');
+  }
+};
+
+const downloadFile = (content: string, filename: string, mimeType: string) => {
+  const blob = new Blob([content], { type: mimeType });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   link.setAttribute('href', url);

@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -20,12 +19,22 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { exportToFile, ExportFormat, ExportFormatIcon } from "@/utils/exportUtils";
+import { format } from "date-fns";
+import { FileCsv, FileExcel } from "lucide-react";
 
 interface LeaveRequestListProps {
   requests: LeaveRequest[];
   currentPage?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  department?: string;
 }
 
 export function LeaveRequestList({ 
@@ -33,6 +42,7 @@ export function LeaveRequestList({
   currentPage = 0,
   totalPages = 1,
   onPageChange = () => {},
+  department,
 }: LeaveRequestListProps) {
   const router = useRouter();
 
@@ -73,6 +83,14 @@ export function LeaveRequestList({
     router.push(`/leave-details/${id}`);
   };
 
+  const handleExport = (format: ExportFormat) => {
+    const filename = department
+      ? `${department}-leave-requests-${format(new Date(), 'yyyy-MM-dd')}`
+      : `leave-requests-${format(new Date(), 'yyyy-MM-dd')}`;
+    
+    exportToFile(requests, filename, format);
+  };
+
   const renderPaginationItems = () => {
     const items = [];
     const maxDisplayedPages = 5;
@@ -100,6 +118,28 @@ export function LeaveRequestList({
 
   return (
     <div className="space-y-4">
+      {requests.length > 0 && (
+        <div className="flex justify-end mb-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-[150px]">
+                Export as...
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => handleExport('csv')}>
+                <FileCsv className="mr-2 h-4 w-4" />
+                CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('excel')}>
+                <FileExcel className="mr-2 h-4 w-4" />
+                Excel
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
+      
       <div className="rounded-md border">
         <Table>
           <TableHeader>

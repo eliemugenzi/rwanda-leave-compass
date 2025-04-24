@@ -12,7 +12,9 @@ import { Loader } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { exportToCSV } from "@/utils/exportUtils";
+import { exportToFile } from "@/utils/exportUtils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { FileExcel, FileCsv } from "lucide-react";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
@@ -125,18 +127,18 @@ const Calendar = () => {
     return Array.from(new Set(matching.map(req => req.employeeName || "").filter(Boolean)));
   };
 
-  const handleExport = () => {
+  const handleExport = (format: 'csv' | 'excel') => {
     if (leaveRequests?.data.content) {
       const fileName = selectedDepartment === "all" 
-        ? `all-departments-leave-requests-${format(new Date(), 'yyyy-MM-dd')}.csv`
-        : `${departments?.data.find(d => d.id === selectedDepartment)?.name}-leave-requests-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+        ? `all-departments-leave-requests-${format(new Date(), 'yyyy-MM-dd')}`
+        : `${departments?.data.find(d => d.id === selectedDepartment)?.name}-leave-requests-${format(new Date(), 'yyyy-MM-dd')}`;
       
       const exportData = leaveRequests.data.content.map(request => ({
         ...request,
         departmentName: departments?.data.find(d => d.id === request.departmentId)?.name
       }));
       
-      exportToCSV(exportData, fileName);
+      exportToFile(exportData, fileName, format);
     }
   };
 
@@ -180,13 +182,26 @@ const Calendar = () => {
               </SelectContent>
             </Select>
           </div>
-          <Button 
-            variant="outline"
-            onClick={handleExport}
-            disabled={!leaveRequests?.data.content?.length}
-          >
-            Export to CSV
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline"
+                disabled={!leaveRequests?.data.content?.length}
+              >
+                Export as...
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => handleExport('csv')}>
+                <FileCsv className="mr-2 h-4 w-4" />
+                CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('excel')}>
+                <FileExcel className="mr-2 h-4 w-4" />
+                Excel
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
 

@@ -1,3 +1,4 @@
+
 // src/components/layout/AppSidebar.tsx
 import {
   Home,
@@ -96,6 +97,24 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
               </li>
             </>
           )}
+          
+          {/* Calendar link - visible to all users */}
+          <li>
+            <Link
+              href="/calendar"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
+                  isActive ? "bg-gray-200 font-medium" : ""
+                }`
+              }
+            >
+              <Calendar className="w-5 h-5 mr-2" />
+              <span className={`${isCollapsed ? "hidden" : ""}`}>
+                Leave Calendar
+              </span>
+            </Link>
+          </li>
+          
           {/* Show admin/HR specific menu options */}
           {isAdminOrHR && (
             <li>

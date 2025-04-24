@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Label,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -63,8 +64,26 @@ export const LeaveStatisticsChart = () => {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={transformedData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
+              <XAxis 
+                dataKey="name" 
+                height={50}
+              >
+                <Label
+                  value="Months"
+                  position="bottom"
+                  offset={0}
+                />
+              </XAxis>
+              <YAxis 
+                width={80}
+              >
+                <Label
+                  value="Number of Days"
+                  angle={-90}
+                  position="left"
+                  offset={-20}
+                />
+              </YAxis>
               <Tooltip />
               <Legend />
               <Bar dataKey="Annual" fill="#2563eb" stackId="a" />

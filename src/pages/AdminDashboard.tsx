@@ -6,6 +6,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllLeaveRequests, searchLeaveRequests } from "@/services/api";
+import { LeaveStatisticsChart } from "@/components/dashboard/LeaveStatisticsChart";
 import { 
   Select,
   SelectContent,
@@ -14,9 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
-import { Loader } from "lucide-react";
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -57,6 +57,11 @@ const AdminDashboard = () => {
         <p className="text-muted-foreground">
           Manage leave requests and approvals
         </p>
+      </div>
+
+      {/* Add the statistics chart */}
+      <div className="mb-6">
+        <LeaveStatisticsChart />
       </div>
 
       <Card>

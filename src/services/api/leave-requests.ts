@@ -7,6 +7,28 @@ import {
   UpdateLeaveRequestStatusResponse,
 } from './types/leave';
 
+export interface LeaveTypeStatistic {
+  count: number;
+  totalDays: number;
+}
+
+export interface MonthlyStatistic {
+  year: number;
+  month: number;
+  approvedLeaveCount: number;
+  totalLeaveDays: number;
+  monthName: string;
+  leaveTypeStatistics: {
+    [key: string]: LeaveTypeStatistic;
+  };
+}
+
+export interface MonthlyStatisticsResponse {
+  message: string;
+  status: number;
+  data: MonthlyStatistic[];
+}
+
 export async function fetchAllLeaveRequests(status?: string, page: number = 0, size: number = 10): Promise<LeaveRequestResponse> {
   const url = new URL(`${BASE_URL}/leave-requests`);
   if (status) {
@@ -61,4 +83,8 @@ export async function updateLeaveRequestStatus(id: string, payload: UpdateLeaveR
     },
     body: JSON.stringify(payload),
   });
+}
+
+export async function fetchMonthlyLeaveStatistics(year: number): Promise<MonthlyStatisticsResponse> {
+  return fetchWithAuth<MonthlyStatisticsResponse>(`${BASE_URL}/leave-requests/monthly-statistics/${year}`);
 }

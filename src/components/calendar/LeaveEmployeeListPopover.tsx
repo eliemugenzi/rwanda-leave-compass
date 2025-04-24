@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { User } from "lucide-react";
 
 interface LeaveEmployeeListPopoverProps {
@@ -13,13 +13,13 @@ export const LeaveEmployeeListPopover = ({ employees, children }: LeaveEmployeeL
   if (!employees.length) return <>{children}</>;
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
+    <HoverCard openDelay={100} closeDelay={200}>
+      <HoverCardTrigger asChild>
         <div className="cursor-pointer">
           {children}
         </div>
-      </PopoverTrigger>
-      <PopoverContent side="top" align="center" className="p-3 w-56">
+      </HoverCardTrigger>
+      <HoverCardContent side="top" align="center" className="p-3 w-56">
         <div className="mb-2 flex items-center gap-2">
           <User className="w-4 h-4 text-muted-foreground" />
           <span className="font-medium text-sm">Employees on Leave</span>
@@ -29,7 +29,7 @@ export const LeaveEmployeeListPopover = ({ employees, children }: LeaveEmployeeL
             <li key={`${name}-${index}`}>{name}</li>
           ))}
         </ul>
-      </PopoverContent>
-    </Popover>
+      </HoverCardContent>
+    </HoverCard>
   );
 };

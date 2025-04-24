@@ -46,7 +46,8 @@ const Calendar = () => {
     return dates.map((date) => ({
       date,
       type: request.type,
-      status: request.status
+      status: request.status,
+      employeeName: request.employeeName
     }));
   });
 
@@ -94,19 +95,24 @@ const Calendar = () => {
   const { user } = useAuth();
 
   // Determine if the user is admin or HR (assuming role === 'admin' is sufficient, extend as needed)
-  const isAdminOrHR = user?.role === "admin" || user?.role === "hr";
+  const isAdminOrHR = user?.role === "admin" || 
+                     user?.role === "ROLE_ADMIN" || 
+                     user?.role === "hr" || 
+                     user?.role === "ROLE_HR";
 
   // Helper to get all employee names on leave for a given date
   const getEmployeesOnLeave = (date: Date): string[] => {
     const dateStr = format(date, "yyyy-MM-dd");
     // Filter by all leaves that match this date
-    const matching = (leaveRequests?.data.content || []).filter(req =>
+    const matching = approvedLeaveRequests.filter(req =>
       req.status === "APPROVED" &&
       (format(parseISO(req.startDate), "yyyy-MM-dd") <= dateStr) &&
-      (format(parseISO(req.endDate), "yyyy-MM-dd") >= dateStr)
+      (format(parseISO(req.endDate), "yyyy-MM-dd") >= dateStr) &&
+      req.employeeName // Make sure employee name exists
     );
+    
     // Distinct names
-    return Array.from(new Set(matching.map(req => req.employeeName).filter(Boolean)));
+    return Array.from(new Set(matching.map(req => req.employeeName || "").filter(Boolean)));
   };
 
   if (isLoading) {
@@ -136,9 +142,8 @@ const Calendar = () => {
             onDateSelect={(newDate) => newDate && setDate(newDate)}
             getLeaveInfo={getLeaveInfo}
             getLeaveDayClassName={getLeaveDayClassName}
-            // Only show employee popover if admin/HR
             showEmployeePopover={isAdminOrHR}
-            getEmployeesOnLeave={isAdminOrHR ? getEmployeesOnLeave : undefined}
+            getEmployeesOnLeave={getEmployeesOnLeave}
           />
         </div>
 

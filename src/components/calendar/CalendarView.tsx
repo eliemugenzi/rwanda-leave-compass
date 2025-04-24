@@ -28,7 +28,7 @@ export const CalendarView = ({
       <CardHeader>
         <CardTitle>Calendar View</CardTitle>
         <CardDescription>
-          Colored dates indicate scheduled leaves
+          {showEmployeePopover ? "Hover over colored dates to see employees on leave" : "Colored dates indicate scheduled leaves"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -46,8 +46,8 @@ export const CalendarView = ({
           components={{
             Day: ({ date: dayDate, ...props }: DayProps) => {
               const isBooked = !!getLeaveInfo(dayDate);
-              const employees =
-                showEmployeePopover && getEmployeesOnLeave
+              const employees = 
+                showEmployeePopover && getEmployeesOnLeave && isBooked
                   ? getEmployeesOnLeave(dayDate) || []
                   : [];
 

@@ -1,154 +1,161 @@
-
+// src/components/layout/AppSidebar.tsx
 import {
-  Calendar,
-  Clock,
   Home,
-  Menu,
-  FileText,
-  User,
-  LogOut,
+  Calendar,
   Settings,
-  Users
+  User,
+  Users,
+  FileText,
+  LogOut,
 } from "lucide-react";
-
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-
-import { Link } from "@/pages-router/navigation";
+import { NavLink } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { Logo } from "./Logo";
 
-export function AppSidebar() {
-  const { user } = useAuth();
-
-  // Identify admin and HR users (case-insensitive, supports both if HR exists)
-  const isAdminOrHR =
-    user &&
-    (
-      (user.role && user.role.toLowerCase().includes("admin")) ||
-      (user.role && user.role.toLowerCase().includes("hr"))
-    );
-
-  const isSupervisor = user?.role === "supervisor" || user?.role === "admin";
-
-  // Navigation items for the sidebar (conditional by user role)
-  // Show "Request Leave" and "My Leaves" only for regular users (not admin or HR)
-  const mainNavItems = [
-    {
-      title: "Dashboard",
-      icon: Home,
-      url: "/",
-    },
-    // Only show when NOT admin or HR
-    ...(!isAdminOrHR
-      ? [
-          {
-            title: "Request Leave",
-            icon: FileText,
-            url: "/request",
-          },
-          {
-            title: "My Leaves",
-            icon: Clock,
-            url: "/my-leaves",
-          }
-        ]
-      : []),
-    {
-      title: "Calendar",
-      icon: Calendar,
-      url: "/calendar",
-    }
-  ];
-
-  // If user is a supervisor, add the supervisor dashboard link
-  if (isSupervisor) {
-    mainNavItems.push({
-      title: "Supervisor Dashboard",
-      icon: Users,
-      url: "/supervisor-dashboard",
-    });
-  }
-
-  const userNavItems = [
-    {
-      title: "My Profile",
-      icon: User,
-      url: "/profile",
-    },
-    {
-      title: "Settings",
-      icon: Settings,
-      url: "/settings",
-    },
-    {
-      title: "Logout",
-      icon: LogOut,
-      url: "/logout",
-    },
-  ];
-
-  return (
-    <Sidebar>
-      <SidebarHeader className="flex items-center px-4 py-2">
-        <Logo />
-        <SidebarTrigger className="ml-auto">
-          <Menu className="h-4 w-4" />
-        </SidebarTrigger>
-      </SidebarHeader>
-      <SidebarContent className="px-2">
-        <SidebarGroup>
-          <SidebarGroupLabel>Main Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainNavItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url} className="flex items-center">
-                      <item.icon className="mr-2 h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>User</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {userNavItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url} className="flex items-center">
-                      <item.icon className="mr-2 h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter className="px-4 py-2">
-        <div className="text-xs text-sidebar-foreground opacity-50">
-          Rwanda Leave Management System
-        </div>
-      </SidebarFooter>
-    </Sidebar>
-  );
+interface AppSidebarProps {
+  isCollapsed: boolean;
 }
 
+export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  return (
+    <div
+      className={`flex flex-col h-full bg-gray-100 border-r border-gray-200 ${
+        isCollapsed ? "w-20" : "w-60"
+      } transition-all duration-200`}
+    >
+      <div className="flex items-center justify-center h-16 border-b border-gray-200 shrink-0">
+        <span className={`font-bold text-xl ${isCollapsed ? "hidden" : ""}`}>
+          {user?.role === 'admin' ? 'Admin Panel' : 'Employee Portal'}
+        </span>
+        {isCollapsed && <Home className="w-6 h-6" />}
+      </div>
+      <nav className="flex-1 py-4">
+        <ul>
+          <li>
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
+                  isActive ? "bg-gray-200 font-medium" : ""
+                }`
+              }
+            >
+              <Home className="w-5 h-5 mr-2" />
+              <span className={`${isCollapsed ? "hidden" : ""}`}>
+                Dashboard
+              </span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/leave-request"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
+                  isActive ? "bg-gray-200 font-medium" : ""
+                }`
+              }
+            >
+              <FileText className="w-5 h-5 mr-2" />
+              <span className={`${isCollapsed ? "hidden" : ""}`}>
+                Request Leave
+              </span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/my-leaves"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
+                  isActive ? "bg-gray-200 font-medium" : ""
+                }`
+              }
+            >
+              <Calendar className="w-5 h-5 mr-2" />
+              <span className={`${isCollapsed ? "hidden" : ""}`}>
+                My Leaves
+              </span>
+            </NavLink>
+          </li>
+          {user?.role === "supervisor" && (
+            <li>
+              <NavLink
+                to="/supervisor-dashboard"
+                className={({ isActive }) =>
+                  `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
+                    isActive ? "bg-gray-200 font-medium" : ""
+                  }`
+                }
+              >
+                <Users className="w-5 h-5 mr-2" />
+                <span className={`${isCollapsed ? "hidden" : ""}`}>
+                  Supervisor Dashboard
+                </span>
+              </NavLink>
+            </li>
+          )}
+          {user?.role === "admin" && (
+            <li>
+              <NavLink
+                to="/admin-dashboard"
+                className={({ isActive }) =>
+                  `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
+                    isActive ? "bg-gray-200 font-medium" : ""
+                  }`
+                }
+              >
+                <Users className="w-5 h-5 mr-2" />
+                <span className={`${isCollapsed ? "hidden" : ""}`}>
+                  Admin Dashboard
+                </span>
+              </NavLink>
+            </li>
+          )}
+          <li>
+            <NavLink
+              to="/profile"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
+                  isActive ? "bg-gray-200 font-medium" : ""
+                }`
+              }
+            >
+              <User className="w-5 h-5 mr-2" />
+              <span className={`${isCollapsed ? "hidden" : ""}`}>
+                Profile
+              </span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/settings"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 ${
+                  isActive ? "bg-gray-200 font-medium" : ""
+                }`
+              }
+            >
+              <Settings className="w-5 h-5 mr-2" />
+              <span className={`${isCollapsed ? "hidden" : ""}`}>
+                Settings
+              </span>
+            </NavLink>
+          </li>
+        </ul>
+      </nav>
+      <div className="p-4 border-t border-gray-200">
+        <button
+          onClick={handleLogout}
+          className="flex items-center text-gray-700 hover:bg-gray-200 px-4 py-2 w-full justify-start"
+        >
+          <LogOut className="w-5 h-5 mr-2" />
+          <span className={`${isCollapsed ? "hidden" : ""}`}>Logout</span>
+        </button>
+      </div>
+    </div>
+  );
+};

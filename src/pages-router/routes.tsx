@@ -1,33 +1,48 @@
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import AdminDashboard from '@/pages/AdminDashboard';
-import Calendar from '@/pages/Calendar';
-import Dashboard from '@/pages/Dashboard';
-import Index from '@/pages/Index';
-import LeaveDetails from '@/pages/LeaveDetails';
-import LeaveRequest from '@/pages/LeaveRequest';
-import Login from '@/pages/Login';
-import Logout from '@/pages/Logout';
-import MyLeaves from '@/pages/MyLeaves';
-import NotFound from '@/pages/NotFound';
-import Profile from '@/pages/Profile';
-import Settings from '@/pages/Settings';
-import SignUp from '@/pages/SignUp';
-import SupervisorDashboard from '@/pages/SupervisorDashboard';
-import AuthCallback from '@/pages/AuthCallback';
 
-export interface Route {
-  path: string;
-  element: React.ReactNode;
-}
+import { Navigate, RouteObject } from "react-router-dom";
+import { lazy } from "react";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
-export const routes: Route[] = [
-  { path: '/', element: <Index /> },
-  { path: '/login', element: <Login /> },
-  { path: '/logout', element: <Logout /> },
-  { path: '/signup', element: <SignUp /> },
-  { path: '/auth/callback', element: <AuthCallback /> },
+// Pages
+const Index = lazy(() => import("@/pages/Index"));
+const Login = lazy(() => import("@/pages/Login"));
+const SignUp = lazy(() => import("@/pages/SignUp"));
+const Logout = lazy(() => import("@/pages/Logout"));
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const LeaveRequest = lazy(() => import("@/pages/LeaveRequest"));
+const MyLeaves = lazy(() => import("@/pages/MyLeaves"));
+const Calendar = lazy(() => import("@/pages/Calendar"));
+const LeaveDetails = lazy(() => import("@/pages/LeaveDetails"));
+const Profile = lazy(() => import("@/pages/Profile"));
+const Settings = lazy(() => import("@/pages/Settings"));
+const SupervisorDashboard = lazy(() => import("@/pages/SupervisorDashboard"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const AuthCallback = lazy(() => import("@/pages/AuthCallback"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+
+export const routes: RouteObject[] = [
   {
-    path: '/dashboard',
+    path: "/",
+    element: <Index />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/signup",
+    element: <SignUp />,
+  },
+  {
+    path: "/logout",
+    element: <Logout />,
+  },
+  {
+    path: "/auth-callback",
+    element: <AuthCallback />,
+  },
+  {
+    path: "/dashboard",
     element: (
       <ProtectedRoute>
         <Dashboard />
@@ -35,39 +50,7 @@ export const routes: Route[] = [
     ),
   },
   {
-    path: '/admin',
-    element: (
-      <ProtectedRoute requiredRoles={['ROLE_ADMIN']}>
-        <AdminDashboard />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/supervisor',
-    element: (
-      <ProtectedRoute requiredRoles={['ROLE_SUPERVISOR', 'ROLE_ADMIN']}>
-        <SupervisorDashboard />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/calendar',
-    element: (
-      <ProtectedRoute>
-        <Calendar />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/my-leaves',
-    element: (
-      <ProtectedRoute>
-        <MyLeaves />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/leave-request',
+    path: "/leave-request",
     element: (
       <ProtectedRoute>
         <LeaveRequest />
@@ -75,7 +58,28 @@ export const routes: Route[] = [
     ),
   },
   {
-    path: '/leave/:id',
+    // Add this redirect route to handle "/request" URL
+    path: "/request",
+    element: <Navigate to="/leave-request" replace />,
+  },
+  {
+    path: "/my-leaves",
+    element: (
+      <ProtectedRoute>
+        <MyLeaves />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/calendar",
+    element: (
+      <ProtectedRoute>
+        <Calendar />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/leave-details/:id",
     element: (
       <ProtectedRoute>
         <LeaveDetails />
@@ -83,7 +87,7 @@ export const routes: Route[] = [
     ),
   },
   {
-    path: '/profile',
+    path: "/profile",
     element: (
       <ProtectedRoute>
         <Profile />
@@ -91,12 +95,31 @@ export const routes: Route[] = [
     ),
   },
   {
-    path: '/settings',
+    path: "/settings",
     element: (
       <ProtectedRoute>
         <Settings />
       </ProtectedRoute>
     ),
   },
-  { path: '*', element: <NotFound /> },
+  {
+    path: "/supervisor-dashboard",
+    element: (
+      <ProtectedRoute>
+        <SupervisorDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin-dashboard",
+    element: (
+      <ProtectedRoute>
+        <AdminDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "*",
+    element: <NotFound />,
+  },
 ];

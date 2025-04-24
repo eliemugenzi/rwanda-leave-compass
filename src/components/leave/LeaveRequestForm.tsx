@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -28,6 +29,14 @@ export function LeaveRequestForm({ onSubmit }: LeaveRequestFormProps) {
     form.reset();
     setStartDate(undefined);
   };
+
+  // Watch for changes to the startDate field
+  const watchStartDate = form.watch("startDate");
+  
+  // Update the startDate state when the form field changes
+  if (watchStartDate !== startDate) {
+    setStartDate(watchStartDate);
+  }
 
   return (
     <Form {...form}>

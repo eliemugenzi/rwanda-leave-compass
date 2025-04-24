@@ -63,7 +63,8 @@ export const CalendarView = ({
           }}
           modifiersStyles={{
             holiday: {
-              color: "rgb(239 68 68)", // text-red-500
+              backgroundColor: "#F2FCE2", // Soft green background
+              color: "rgb(34 197 94)", // Green text for better readability
               fontWeight: "bold"
             }
           }}
@@ -124,3 +125,4 @@ export const CalendarView = ({
     </Card>
   );
 };
+

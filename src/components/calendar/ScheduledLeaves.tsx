@@ -32,8 +32,11 @@ export const ScheduledLeaves = ({ date, leaves }: ScheduledLeavesProps) => {
                    leave.type === LeaveType.SICK ? 'Sick Leave' :
                    leave.type === LeaveType.MATERNITY ? 'Maternity Leave' : 'Paternity Leave'}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground mb-1">
                   {format(parseISO(leave.startDate), 'MMM dd')} - {format(parseISO(leave.endDate), 'MMM dd, yyyy')}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {leave.employeeName}
                 </div>
               </div>
             ))

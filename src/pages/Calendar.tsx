@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { format, isBefore, isWithinInterval, parseISO } from "date-fns";
@@ -7,14 +8,10 @@ import { fetchAllLeaveRequests, getDepartments } from "@/services/api";
 import { CalendarView } from "@/components/calendar/CalendarView";
 import { LeaveLegend } from "@/components/calendar/LeaveLegend";
 import { ScheduledLeaves } from "@/components/calendar/ScheduledLeaves";
-import { addDays } from "date-fns";
-import { Loader } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { exportToFile } from "@/utils/exportUtils";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { FileExcel, FileCsv } from "lucide-react";
+import { DepartmentFilter } from "@/components/calendar/DepartmentFilter";
+import { CalendarExport } from "@/components/calendar/CalendarExport";
+import { CalendarLoading } from "@/components/calendar/CalendarLoading";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
@@ -25,22 +22,22 @@ const Calendar = () => {
     queryFn: () => getDepartments(),
   });
   
-  // Updated query to include selectedDepartment in fetchFn
   const { data: leaveRequests, isLoading: isLeavesLoading } = useQuery({
     queryKey: ['leaveRequests', 'calendar', selectedDepartment],
     queryFn: () => fetchAllLeaveRequests(undefined, 0, 100, selectedDepartment !== "all" ? selectedDepartment : undefined),
   });
 
-  // Only include APPROVED leaves
   const approvedLeaveRequests = (leaveRequests?.data.content || []).filter(
     (request) => request.status === "APPROVED"
   );
 
-  console.log("Selected department:", selectedDepartment);
-  console.log("Filtered leaves:", approvedLeaveRequests.length);
-  console.log("All leaves:", leaveRequests?.data.content?.length || 0);
+  const { user } = useAuth();
+  const isAdminOrHR = user?.role === "admin" || 
+                     user?.role === "ROLE_ADMIN" || 
+                     user?.role === "hr" || 
+                     user?.role === "ROLE_HR";
 
-  // Helper function to get all dates in a date range
+  // Helper functions
   const getDatesInRange = (startDate: string, endDate: string) => {
     const start = parseISO(startDate);
     const end = parseISO(endDate);
@@ -49,13 +46,12 @@ const Calendar = () => {
 
     while (isBefore(currentDate, end) || currentDate.getTime() === end.getTime()) {
       dates.push(format(currentDate, "yyyy-MM-dd"));
-      currentDate = addDays(currentDate, 1);
+      currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
     }
 
     return dates;
   };
 
-  // Generate all leave dates (only for approved leaves)
   const allLeaveDates = approvedLeaveRequests.flatMap((request) => {
     const dates = getDatesInRange(request.startDate, request.endDate);
     return dates.map((date) => ({
@@ -67,13 +63,11 @@ const Calendar = () => {
     }));
   });
 
-  // Function to check if a date has any leave requests
   const getLeaveInfo = (date: Date) => {
     const dateStr = format(date, "yyyy-MM-dd");
     return allLeaveDates.find((leaveDate) => leaveDate.date === dateStr);
   };
 
-  // Classname generator for leave types, with color for compassionate leave
   const getLeaveDayClassName = (date: Date): string => {
     const leaveInfo = getLeaveInfo(date);
     if (!leaveInfo) return "";
@@ -94,27 +88,6 @@ const Calendar = () => {
     }
   };
 
-  const getMonthLeaves = () => {
-    const currentMonthStart = new Date(date.getFullYear(), date.getMonth(), 1);
-    const currentMonthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    
-    return approvedLeaveRequests.filter((request) => {
-      const startDate = parseISO(request.startDate);
-      const endDate = parseISO(request.endDate);
-      
-      return isWithinInterval(startDate, { start: currentMonthStart, end: currentMonthEnd }) ||
-             isWithinInterval(endDate, { start: currentMonthStart, end: currentMonthEnd }) ||
-             (isBefore(startDate, currentMonthStart) && isBefore(currentMonthEnd, endDate));
-    });
-  };
-
-  const { user } = useAuth();
-
-  const isAdminOrHR = user?.role === "admin" || 
-                     user?.role === "ROLE_ADMIN" || 
-                     user?.role === "hr" || 
-                     user?.role === "ROLE_HR";
-
   const getEmployeesOnLeave = (date: Date): string[] => {
     const dateStr = format(date, "yyyy-MM-dd");
     const matching = approvedLeaveRequests.filter(req =>
@@ -127,33 +100,24 @@ const Calendar = () => {
     return Array.from(new Set(matching.map(req => req.employeeName || "").filter(Boolean)));
   };
 
-  const handleExport = (format: 'csv' | 'excel') => {
-    if (leaveRequests?.data.content) {
-      const fileName = selectedDepartment === "all" 
-        ? `all-departments-leave-requests-${format(new Date(), 'yyyy-MM-dd')}`
-        : `${departments?.data.find(d => d.id === selectedDepartment)?.name}-leave-requests-${format(new Date(), 'yyyy-MM-dd')}`;
-      
-      const exportData = leaveRequests.data.content.map(request => ({
-        ...request,
-        departmentName: departments?.data.find(d => d.id === request.departmentId)?.name
-      }));
-      
-      exportToFile(exportData, fileName, format);
-    }
-  };
-
   if (isLeavesLoading || isDepartmentsLoading) {
     return (
       <AppLayout>
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <Loader className="h-8 w-8 animate-spin text-primary mb-2" aria-label="Loading calendar" />
-          <span className="text-muted-foreground">Loading calendar...</span>
-        </div>
+        <CalendarLoading />
       </AppLayout>
     );
   }
 
-  const monthLeaves = getMonthLeaves();
+  const monthLeaves = approvedLeaveRequests.filter((request) => {
+    const currentMonthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+    const currentMonthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    const startDate = parseISO(request.startDate);
+    const endDate = parseISO(request.endDate);
+    
+    return isWithinInterval(startDate, { start: currentMonthStart, end: currentMonthEnd }) ||
+           isWithinInterval(endDate, { start: currentMonthStart, end: currentMonthEnd }) ||
+           (isBefore(startDate, currentMonthStart) && isBefore(currentMonthEnd, endDate));
+  });
 
   return (
     <AppLayout>
@@ -165,43 +129,17 @@ const Calendar = () => {
       {isAdminOrHR && departments?.data && (
         <div className="mb-6 flex items-center gap-4">
           <div className="max-w-xs flex-1">
-            <Select
-              value={selectedDepartment}
-              onValueChange={setSelectedDepartment}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by department" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
-                {departments.data.map((dept) => (
-                  <SelectItem key={dept.id} value={dept.id}>
-                    {dept.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <DepartmentFilter
+              selectedDepartment={selectedDepartment}
+              departments={departments.data}
+              onDepartmentChange={setSelectedDepartment}
+            />
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="outline"
-                disabled={!leaveRequests?.data.content?.length}
-              >
-                Export as...
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => handleExport('csv')}>
-                <FileCsv className="mr-2 h-4 w-4" />
-                CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport('excel')}>
-                <FileExcel className="mr-2 h-4 w-4" />
-                Excel
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <CalendarExport
+            departments={departments.data}
+            selectedDepartment={selectedDepartment}
+            data={leaveRequests?.data.content || []}
+          />
         </div>
       )}
 

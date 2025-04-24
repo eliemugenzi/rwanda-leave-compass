@@ -1,3 +1,4 @@
+
 export enum LeaveType {
   ANNUAL = 'ANNUAL',
   SICK = 'SICK',
@@ -42,6 +43,10 @@ export interface LeaveRequest {
     email: string;
   } | null;
   updatedAt?: string;
+  // Adding the missing properties
+  supportingDocumentUrl?: string;
+  supportingDocumentName?: string;
+  durationType?: "FULL_DAY" | "HALF_DAY";
 }
 
 export interface User {

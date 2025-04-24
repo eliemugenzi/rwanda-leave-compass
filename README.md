@@ -63,7 +63,7 @@ npm run dev
 docker-compose up
 ```
 
-2. Access the application at `http://localhost:5000`
+2. Access the application at `http://localhost:7000`
 
 To run in detached mode:
 ```sh
@@ -84,10 +84,10 @@ docker build -t time-away .
 
 2. Run the container:
 ```sh
-docker run -p 5000:5000 time-away
+docker run -p 7000:7000 time-away
 ```
 
-3. Access the application at `http://localhost:5000`
+3. Access the application at `http://localhost:7000`
 
 ## Project Structure
 

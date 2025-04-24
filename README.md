@@ -65,10 +65,10 @@ docker build -t time-away .
 
 2. Run the container:
 ```sh
-docker run -p 8080:8080 time-away
+docker run -p 5000:5000 time-away
 ```
 
-3. Access the application at `http://localhost:8080`
+3. Access the application at `http://localhost:5000`
 
 ## Project Structure
 

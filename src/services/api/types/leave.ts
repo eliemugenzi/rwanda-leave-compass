@@ -1,4 +1,3 @@
-
 import { LeaveType } from '@/types/leave';
 
 export interface PaginatedResponse<T> {
@@ -43,6 +42,7 @@ export interface LeaveRequest {
   supportingDocumentUrl?: string;
   supportingDocumentName?: string;
   durationType?: "FULL_DAY" | "HALF_DAY";
+  departmentId?: string;
 }
 
 export interface CreateLeaveRequestPayload {

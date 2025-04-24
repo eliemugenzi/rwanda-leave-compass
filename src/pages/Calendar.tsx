@@ -1,24 +1,39 @@
-
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { format, isBefore, isWithinInterval, parseISO } from "date-fns";
 import { LeaveType } from "@/types/leave";
 import { useQuery } from "@tanstack/react-query";
-import { fetchAllLeaveRequests } from "@/services/api";
+import { fetchAllLeaveRequests, getDepartments } from "@/services/api";
 import { CalendarView } from "@/components/calendar/CalendarView";
 import { LeaveLegend } from "@/components/calendar/LeaveLegend";
 import { ScheduledLeaves } from "@/components/calendar/ScheduledLeaves";
 import { addDays } from "date-fns";
 import { Loader } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
+  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
   
-  const { data: leaveRequests, isLoading } = useQuery({
-    queryKey: ['leaveRequests', 'calendar'],
-    queryFn: () => fetchAllLeaveRequests(),
+  const { data: departments, isLoading: isDepartmentsLoading } = useQuery({
+    queryKey: ['departments'],
+    queryFn: () => getDepartments(),
   });
+  
+  const { data: leaveRequests, isLoading: isLeavesLoading } = useQuery({
+    queryKey: ['leaveRequests', 'calendar', selectedDepartment],
+    queryFn: () => fetchAllLeaveRequests(undefined, 0, 100),
+  });
+
+  // Only include APPROVED leaves and filter by department if selected
+  const approvedLeaveRequests = (leaveRequests?.data.content || []).filter(
+    (request) => {
+      const isApproved = request.status === "APPROVED";
+      if (!selectedDepartment) return isApproved;
+      return isApproved && request.departmentId === selectedDepartment;
+    }
+  );
 
   // Helper function to get all dates in a date range
   const getDatesInRange = (startDate: string, endDate: string) => {
@@ -35,11 +50,6 @@ const Calendar = () => {
     return dates;
   };
 
-  // Only include APPROVED leaves (new filtering)
-  const approvedLeaveRequests = (leaveRequests?.data.content || []).filter(
-    (request) => request.status === "APPROVED"
-  );
-
   // Generate all leave dates (only for approved leaves)
   const allLeaveDates = approvedLeaveRequests.flatMap((request) => {
     const dates = getDatesInRange(request.startDate, request.endDate);
@@ -55,20 +65,6 @@ const Calendar = () => {
   const getLeaveInfo = (date: Date) => {
     const dateStr = format(date, "yyyy-MM-dd");
     return allLeaveDates.find((leaveDate) => leaveDate.date === dateStr);
-  };
-
-  const getMonthLeaves = () => {
-    const currentMonthStart = new Date(date.getFullYear(), date.getMonth(), 1);
-    const currentMonthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    
-    return approvedLeaveRequests.filter((request) => {
-      const startDate = parseISO(request.startDate);
-      const endDate = parseISO(request.endDate);
-      
-      return isWithinInterval(startDate, { start: currentMonthStart, end: currentMonthEnd }) ||
-             isWithinInterval(endDate, { start: currentMonthStart, end: currentMonthEnd }) ||
-             (isBefore(startDate, currentMonthStart) && isBefore(currentMonthEnd, endDate));
-    });
   };
 
   // Classname generator for leave types, with color for compassionate leave
@@ -92,30 +88,40 @@ const Calendar = () => {
     }
   };
 
+  const getMonthLeaves = () => {
+    const currentMonthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+    const currentMonthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    
+    return approvedLeaveRequests.filter((request) => {
+      const startDate = parseISO(request.startDate);
+      const endDate = parseISO(request.endDate);
+      
+      return isWithinInterval(startDate, { start: currentMonthStart, end: currentMonthEnd }) ||
+             isWithinInterval(endDate, { start: currentMonthStart, end: currentMonthEnd }) ||
+             (isBefore(startDate, currentMonthStart) && isBefore(currentMonthEnd, endDate));
+    });
+  };
+
   const { user } = useAuth();
 
-  // Determine if the user is admin or HR (assuming role === 'admin' is sufficient, extend as needed)
   const isAdminOrHR = user?.role === "admin" || 
                      user?.role === "ROLE_ADMIN" || 
                      user?.role === "hr" || 
                      user?.role === "ROLE_HR";
 
-  // Helper to get all employee names on leave for a given date
   const getEmployeesOnLeave = (date: Date): string[] => {
     const dateStr = format(date, "yyyy-MM-dd");
-    // Filter by all leaves that match this date
     const matching = approvedLeaveRequests.filter(req =>
       req.status === "APPROVED" &&
       (format(parseISO(req.startDate), "yyyy-MM-dd") <= dateStr) &&
       (format(parseISO(req.endDate), "yyyy-MM-dd") >= dateStr) &&
-      req.employeeName // Make sure employee name exists
+      req.employeeName
     );
     
-    // Distinct names
     return Array.from(new Set(matching.map(req => req.employeeName || "").filter(Boolean)));
   };
 
-  if (isLoading) {
+  if (isLeavesLoading || isDepartmentsLoading) {
     return (
       <AppLayout>
         <div className="flex flex-col items-center justify-center min-h-screen">
@@ -134,6 +140,27 @@ const Calendar = () => {
         <h1 className="text-3xl font-bold mb-1">Leave Calendar</h1>
         <p className="text-muted-foreground">View all scheduled leaves</p>
       </div>
+
+      {isAdminOrHR && departments?.data && (
+        <div className="mb-6 max-w-xs">
+          <Select
+            value={selectedDepartment}
+            onValueChange={setSelectedDepartment}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by department" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All Departments</SelectItem>
+              {departments.data.map((dept) => (
+                <SelectItem key={dept.id} value={dept.id}>
+                  {dept.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">

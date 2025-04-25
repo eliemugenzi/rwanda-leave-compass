@@ -120,13 +120,6 @@ The project can be deployed by clicking the "Publish" button in Lovable or by co
 
 You can connect a custom domain through the Project Settings in Lovable. Navigate to Project > Settings > Domains and follow the instructions.
 
-## License
-
-MIT
-
-## Contact
-
-[Elie Mugenzi](https://elieweb.dev)
 
 # Time Away Frontend
 
@@ -138,21 +131,14 @@ docker pull eliemugenzi/timeaway-frontend
 ```
 
 ### 2. Run the Container
-```bash
-# Run in development mode (to use local backend at http://localhost:8083/api/v1)
+
+# Alternative: Run in development mode with expanded syntax
 docker run -d \
   --name timeaway-frontend \
   -p 7001:7000 \
   -e NODE_ENV=development \
   eliemugenzi/timeaway-frontend
 
-# Or run in production mode (to use production backend)
-docker run -d \
-  --name timeaway-frontend \
-  -p 7001:7000 \
-  -e NODE_ENV=production \
-  eliemugenzi/timeaway-frontend
-```
 
 ### 3. Access the Application
 Once running, you can access the application at:
@@ -179,3 +165,11 @@ Restart the container:
 ```bash
 docker restart timeaway-frontend
 ```
+
+## License
+
+MIT
+
+## Contact
+
+[Elie Mugenzi](https://elieweb.dev)
